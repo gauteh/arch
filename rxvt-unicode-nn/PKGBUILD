@@ -1,0 +1,57 @@
+# $Id$
+# Maintainer: tobias <tobias@archlinux.org>
+# Contributor: dibblethewrecker dibblethewrecker.at.jiwe.dot.org
+
+pkgname=rxvt-unicode-nn
+basepkg=rxvt-unicode
+pkgver=9.06
+pkgrel=1
+pkgdesc="an unicode enabled rxvt-clone terminal emulator (urxvt)"
+arch=(i686 x86_64)
+depends=('gcc-libs' 'libxft' 'libxpm')
+makedepends=('ncurses' 'perl>=5.10.0' 'pkgconfig')
+optdepends=('perl: lots of utilities' 'gtk-perl: to use the urxvt-tabbed')
+url="http://software.schmorp.de/pkg/rxvt-unicode.html"
+license=("GPL2")
+source=(http://dist.schmorp.de/rxvt-unicode/${basepkg}-${pkgver}.tar.bz2 \
+        ${basepkg}.desktop ${basepkg}.png)
+md5sums=('4cb9330e99fc0b0b05cebf3581557dd8' '5bfefa1b41c2b81ca18f2ef847330543' \
+         '84328cada91751df07324d95f8be4d1b')
+
+provides=('rxvt-unicode')
+conflicts=('rxvt-unicode')
+replaces=('rxvt-unicode')
+
+build() {
+  cd ${startdir}/src/${basepkg}-${pkgver}
+  patch -p1 < doc/urxvt-8.2-256color.patch || return 1
+  ./configure --prefix=/usr \
+    --with-terminfo=/usr/share/terminfo \
+    --enable-font-styles \
+    --disable-xim \
+    --enable-codesets=all \
+    --enable-everything \
+    --enable-unicode3 \
+    --enable-keepscrolling \
+    --enable-selectionscrolling \
+    --enable-smart-resize \
+    --enable-xpm-background \
+    --enable-transparency \
+    --enable-utmp \
+    --enable-wtmp \
+    --enable-lastlog \
+    --enable-xterm-colors=256 \
+    --enable-xft
+  make || return 1
+  mkdir -p ${startdir}/pkg/usr/share/terminfo
+  export TERMINFO=${startdir}/pkg/usr/share/terminfo
+  make DESTDIR=${startdir}/pkg install
+ # install the tabbing wrapper ( requires gtk2-perl! )
+  sed -i 's/\"rxvt\"/"urxvt"/' doc/rxvt-tabbed
+  install -Dm 755 doc/rxvt-tabbed ${startdir}/pkg/usr/bin/urxvt-tabbed
+ # install freedesktop menu and icon ( icon from cvs checkout )
+  install -Dm644 ../${basepkg}.desktop \
+    ${startdir}/pkg/usr/share/applications/${basepkg}.desktop
+  install -Dm644 ../${basepkg}.png \
+    ${startdir}/pkg/usr/share/pixmaps/${basepkg}.png
+}

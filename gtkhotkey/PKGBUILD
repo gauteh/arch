@@ -1,0 +1,20 @@
+# Contributor: Gaute Hope <eg@gaute.vetsj.com>
+pkgname=gtkhotkey
+pkgver=0.2.0
+pkgrel=2
+pkgdesc="Platform independent hotkey handling for Gtk+ applications"
+arch=('i686')
+url="https://launchpad.net/gtkhotkey"
+license=('LGPL3')
+depends=('glib2' 'gtk2')
+source=(http://launchpad.net/gtkhotkey/0.2/0.2.0/+download/gtkhotkey-${pkgver}.tar.gz)
+
+md5sums=('5fe121e836d2b58beafbecca7a9e91be')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr || return 1
+  make || return 1
+  make DESTDIR="${pkgdir}" install || return 1
+}
+
