@@ -1,0 +1,35 @@
+# vim:set ts=2 sw=2 et:
+
+# Contributor: Rick W. Chen <stuffcorpse at archlinux dot us>
+# Contributor: Gaute Hope <eg@gaute.vetsj.com>
+
+pkgname=ttf-anonymous-pro
+pkgver=1.001
+pkgrel=1
+pkgdesc="A family of four fixed-width fonts designed especially with coding in mind"
+arch=(i686)
+url="http://www.ms-studio.com/FontSales/anonymouspro.html"
+license=(custom:freeware)
+groups=()
+depends=(fontconfig xorg-fonts-encodings xorg-font-utils)
+makedepends=(unzip)
+install=$pkgname.install
+source=("http://www.ms-studio.com/FontSales/AnonymousPro.zip")
+md5sums=('3cdcfc1979242670410e26ce42d226b0')
+
+build() {
+  cd "$srcdir"/AnonymousPro || return 1
+
+  install -d -m755 "$pkgdir"/usr/share/fonts/TTF \
+    "$pkgdir"/usr/share/licenses/"$pkgname" \
+    "${pkgdir}/usr/share/doc/${pkgname}" || return 1
+
+  install -m644 Anonymous\ Pro*.ttf \
+    "$pkgdir"/usr/share/fonts/TTF/ || return 1
+
+  install -m644 OFL.txt OFL-FAQ.txt \
+    "$pkgdir"/usr/share/licenses/"$pkgname" || return 1
+
+  install -m644 FONTLOG.txt README.txt \
+    "${pkgdir}/usr/share/doc/${pkgname}/" || return 1
+}
