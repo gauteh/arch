@@ -1,0 +1,27 @@
+# Contributor: Tocer Deng <tocer.deng@gmail.com>
+pkgname=mime-support
+pkgver=3.48_1
+pkgrel=1
+pkgdesc="Mailcap and support programs from debian"
+arch=('i686' 'x86_64')
+url="http://packages.debian.org/en/sid/mime-support"
+license=('custom')
+depends=('perl' 'file' 'mime-types')
+source=(http://ftp.us.debian.org/debian/pool/main/m/mime-support/${pkgname}_${pkgver:0:4}-${pkgver:5}_all.deb)
+noextract=()
+
+md5sums=('e90d5f0696df26561b2648ccd9724c0b')
+
+build() {
+  cd "$srcdir"
+  ar x ${pkgname}_${pkgver:0:4}-${pkgver:5}_all.deb data.tar.gz
+  tar fx data.tar.gz -C ${pkgdir}
+  rm ${pkgdir}/etc/mime.types
+  mv ${pkgdir}/usr/bin/{edit,alter}
+  mkdir -p ${pkgdir}/usr/share/licenses/mime-support
+  cp ${pkgdir}/usr/share/doc/mime-support/copyright ${pkgdir}/usr/share/licenses/mime-support/
+  rm -rf ${pkgdir}/usr/share/doc
+}
+
+# vim:set ts=2 sw=2 et:
+
