@@ -1,0 +1,25 @@
+# Author: Gaute Hope <eg@gaute.vetsj.com>
+# TODO/WIP: Missing dependencies, doesn't work yet
+
+pkgname=libguestfs
+pkgver=1.0.79
+pkgrel=1
+pkgdesc="libguestfs is a library for accessing and modifying virtual machine (VM) disk images"
+arch=('i686')
+url="http://libguestfs.org/"
+license=('GPL2')
+depends=('squashfs-tools>=4.0' 'fakeroot>=1.14.3-1' 'fakechroot>=2.9'
+         'cdrkit>=1.1.9-2' 'libxml2>=2.7.6-1' 'fuse>=2.8.1-1'
+         'augeas>=0.6.0-1' 'qemu>=0.11' 'readline>=6.0.004-1' 'perl'
+         'python' 'ruby' 'perl-libintl-perl' 'debootstrap')
+
+source=(http://libguestfs.org/download/${pkgname}-${pkgver}.tar.gz)
+
+md5sums=('292f818a0e8ad9b193f133c2ad92d9ff')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr || return 1
+  make || return 1
+  make DESTDIR="${pkgdir}" install || return 1
+}
