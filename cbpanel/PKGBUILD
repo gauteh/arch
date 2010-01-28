@@ -1,0 +1,21 @@
+pkgname=cbpanel
+pkgver=0.2.1
+pkgrel=1
+pkgdesc="Crunchbang Panel"
+arch=('i686')
+url="http://crunchbanglinux.org/forums/topic/2515/crunchbang-panel/page/1/"
+license=('unknown')
+source=(http://www.ad-comp.be/public/projets/cbpanel/${pkgname}.${pkgver}-all.deb)
+md5sums=('8d3d53e7bea9278672be904df0d78f9b')
+
+build() {
+  msg "Uncompresing..."
+  cd "${startdir}/src/"
+  ar x ${pkgname}.${pkgver}-all.deb
+  tar xzf ${startdir}/src/data.tar.gz
+  tar xzf ${startdir}/src/control.tar.gz
+  msg "Copying files..."
+  mkdir ${startdir}/pkg/usr/
+  cp -R ${startdir}/src/usr/* ${startdir}/pkg/usr/
+
+}
