@@ -43,7 +43,7 @@ build() {
   ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
       --libexecdir=/usr/lib/hal --with-udev-prefix=/etc \
       --enable-static=no --disable-acpi-ibm \
-      --disable-docbook-docs --disable-console-kit \
+      --disable-docbook-docs --disable-gtk-doc --disable-console-kit \
       --disable-policy-kit --disable-acl-management \
       --enable-umount-helper --disable-smbios \
       --with-hal-user=hal --with-hal-group=hal \
