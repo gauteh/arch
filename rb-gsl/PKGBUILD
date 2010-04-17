@@ -12,7 +12,7 @@ makedepends=()
 conflicts=(ruby-gsl)
 replaces=(ruby-gsl)
 provides=(ruby-gsl)
-source=(http://rubyforge.org/frs/download.php/28909/rb-gsl-$pkgver.tar.gz)
+source=(http://rubyforge.org/frs/download.php/69960/rb-gsl-1.14.3.tar.gz)
 
 build() {
   cd $startdir/src/rb-gsl-$pkgver
@@ -21,4 +21,5 @@ build() {
   ruby setup.rb install --prefix=$startdir/pkg
 }
 
-md5sums=('d41d8cd98f00b204e9800998ecf8427e')
+md5sums=('615b979433f99aa18a17da65b40e1e08')
+
