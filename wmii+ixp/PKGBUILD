@@ -1,0 +1,33 @@
+# $Id: PKGBUILD 67079 2010-02-03 00:23:13Z andrea $
+# Author: Gaute Hope <eg@gaute.vetsj.com> 
+
+pkgname=wmii+ixp
+pkgver=3.9b1
+pkgrel=1
+pkgdesc="Next generation WMI (Window Manager Improved 2)"
+arch=('i686' 'x86_64') 
+license=('MIT')
+url="http://wmii.suckless.org/"
+depends=('glibc' 'libx11' 'dmenu' 'libxt')
+provides=('libixp' 'wmii')
+options=('!makeflags')
+
+source=(http://dl.suckless.org/wmii/${pkgname}-${pkgver}.tbz
+        'wmii.desktop')
+
+md5sums=('3ed907c820194b7186f549533bb6d60c'
+         'dff79a4ae5303b8f332c4eea8fb1420f')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+
+	_flags=("PREFIX=/usr" "ETC=/etc" "DESTDIR=${pkgdir}")
+
+	make ${_flags[@]} all || return 1
+	make ${_flags[@]} install || return 1
+
+  install -Dm644 $srcdir/wmii.desktop $pkgdir/usr/share/xsessions/wmii.desktop
+
+	install -D -m644 img/wmii.png ${pkgdir}/usr/share/pixmaps/wmii.png
+  install -Dm644 LICENSE $pkgdir/usr/share/licenses/wmii/LICENSE
+}
