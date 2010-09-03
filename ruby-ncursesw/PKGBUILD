@@ -1,0 +1,27 @@
+# Maintainer: David Campbell <davekong@archlinux.us>
+pkgname=ruby-ncursesw
+pkgver=1.2.4
+pkgrel=2
+pkgdesc="Ruby wrapper for ncurses providing wide character support."
+arch=('i686' 'x86_64')
+url="http://ncurses-ruby.berlios.de/"
+license=('LGPL2.1')
+depends=('ruby')
+makedepends=('rubygems')
+source=("http://download.berlios.de/ncurses-ruby/ncurses-ruby-1.2.4.tar.bz2" "fix-stringvalueptr.diff")
+md5sums=('8a3e0ed33ac245241b6afd911520c205'
+         '799222a2e26a63b7db6b1f209606c35b')
+
+build() {
+  cd "$srcdir/ncurses-ruby-$pkgver"
+  patch -p1 < $srcdir/fix-stringvalueptr.diff
+  ruby extconf.rb
+  make
+  DESTDIR=${pkgdir} make install
+
+  #local _gemdir="$(ruby -rubygems -e'puts Gem.default_dir')"
+  #gem install --ignore-dependencies -i "$pkgdir$_gemdir" ncursesw-$pkgver.gem \
+  #-n "$pkgdir/usr/bin"
+}
+
+# vim:set ts=2 sw=2 et:
