@@ -4,7 +4,7 @@
 # Contributor: Gaute Hope <eg@gaute.vetsj.com>
  
 pkgname=gthumb
-pkgver=2.11.3
+pkgver=2.11.91
 pkgrel=1
 pkgdesc="Image browser and viewer for the GNOME Desktop"
 arch=(i686 x86_64)
@@ -15,7 +15,7 @@ makedepends=('intltool' 'pkgconfig' 'gnome-doc-utils>=0.20.1')
 options=('!libtool' '!emptydirs')
 install=gthumb.install
 source=(http://ftp.gnome.org/pub/GNOME/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2)
-md5sums=('ebb332b2ef604c57c63d283f08af71a1')
+md5sums=('c986a210bdc4127c97b36fa2b4f20efd')
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
