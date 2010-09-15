@@ -1,0 +1,35 @@
+# $Id: PKGBUILD 1322 2009-08-16 05:49:24Z jlichtblau $
+# Maintainer: Jaroslav Lichtblau <dragonlord@aur.archlinux.org>
+# Contributor: Callan Barrett <wizzomafizzo@gmail.com>
+# Contributor: mucknert <mucknert@gmx.net>
+# Contributor: Gaute Hope <eg@gaute.vetsj.com>
+
+pkgname=offlineimap
+pkgver=6.2.0.2
+pkgrel=1
+pkgdesc='A powerful IMAP/Maildir synchronization tool'
+arch=('i686' 'x86_64')
+url='http://software.complete.org/offlineimap/'
+license=('GPL')
+depends=('python')
+noextract=($pkgname.1.gz)
+source=(http://github.com/jgoerzen/offlineimap/tarball/debian/${pkgver}/offlineimap.tgz \
+        $pkgname.1.gz)
+
+md5sums=('e1a01b6b1c1a70a1afaefb0a20634bc1'
+         '0213e6f5d032be2ec8eedfbb52134ef3')
+
+releasename=jgoerzen-offlineimap-0f1a667
+
+build() {
+  cd ${srcdir}/$releasename
+
+  python setup.py build install --root=${pkgdir} || return 1
+
+  install -D -m644 $pkgname.conf.minimal ${pkgdir}/usr/share/$pkgname/$pkgname.conf.minimal || return 1
+  install -D -m644 $pkgname.conf ${pkgdir}/usr/share/$pkgname/$pkgname.conf || return 1
+
+#man page doesn't convert: http://lists.complete.org/offlineimap@complete.org/2008/05/msg00018.html.gz
+#extracted from debian package: http://ftp.debian.org/debian/pool/main/o/offlineimap/offlineimap_6.2.0_all.deb
+  install -D -m644 ${srcdir}/$pkgname.1.gz ${pkgdir}/usr/share/man/man1/$pkgname.1.gz || return 1
+}
