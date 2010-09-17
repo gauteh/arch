@@ -1,0 +1,12 @@
+diff -ru old//ftplugin/latex-suite/wizardfuncs.vim new//ftplugin/latex-suite/wizardfuncs.vim
+--- old//ftplugin/latex-suite/wizardfuncs.vim	2006-05-01 23:29:40.000000000 +0200
++++ new//ftplugin/latex-suite/wizardfuncs.vim	2010-09-17 17:23:41.000000000 +0200
+@@ -193,7 +193,7 @@
+ 	return section_name
+ endfunction "}}}
+ function! s:Tex_section_call(section_name) "{{{
+-	exe "normal! i\\".a:section_name."{<++>}<++>\<Esc>0\<C-j>"
++	exe "normal! i\\".a:section_name."{<++>}<++>\<Esc>0\<C-g>"
+ "	let ret_section = "\\".a:section_name."{<++>}<++>"
+ "	exe "normal! i\<C-r>=IMAP_PutTextWithMovement(ret_section)\<CR>"
+ "	normal f}i
