@@ -1,0 +1,351 @@
+Only in new/: build
+diff -ru old//offlineimap/accounts.py new//offlineimap/accounts.py
+--- old//offlineimap/accounts.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/accounts.py	2010-11-03 09:59:17.423333587 +0100
+@@ -170,7 +170,7 @@
+         self.ui.acct(self.name)
+         accountmetadata = self.getaccountmeta()
+         if not os.path.exists(accountmetadata):
+-            os.mkdir(accountmetadata, 0700)            
++            os.mkdir(accountmetadata, 0o0700)            
+ 
+         self.remoterepos = offlineimap.repository.Base.LoadRepository(self.getconf('remoterepository'), self, 'remote')
+ 
+diff -ru old//offlineimap/CustomConfig.py new//offlineimap/CustomConfig.py
+--- old//offlineimap/CustomConfig.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/CustomConfig.py	2010-11-03 09:57:35.470000524 +0100
+@@ -50,7 +50,7 @@
+     def getmetadatadir(self):
+         metadatadir = os.path.expanduser(self.getdefault("general", "metadata", "~/.offlineimap"))
+         if not os.path.exists(metadatadir):
+-            os.mkdir(metadatadir, 0700)
++            os.mkdir(metadatadir, 0o0700)
+         return metadatadir
+ 
+     def getlocaleval(self):
+diff -ru old//offlineimap/folder/IMAP.py new//offlineimap/folder/IMAP.py
+--- old//offlineimap/folder/IMAP.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/folder/IMAP.py	2010-11-03 10:06:20.220000347 +0100
+@@ -259,7 +259,7 @@
+         headervalue = imapobj._quote(headervalue)
+         try:
+             matchinguids = imapobj.uid('search', 'HEADER', headername, headervalue)[1][0]
+-        except imapobj.error, err:
++        except imapobj.error as err:
+             # IMAP server doesn't implement search or had a problem.
+             ui.debug('imap', "savemessage_searchforheader: got IMAP error '%s' while attempting to UID SEARCH for message with header %s" % (err, headername))
+             return 0
+@@ -273,7 +273,7 @@
+         ui.debug('imap', 'savemessage_searchforheader: matchinguids now ' + \
+                  repr(matchinguids))
+         if len(matchinguids) != 1 or matchinguids[0] == None:
+-            raise ValueError, "While attempting to find UID for message with header %s, got wrong-sized matchinguids of %s" % (headername, str(matchinguids))
++            raise ValueError ("While attempting to find UID for message with header %s, got wrong-sized matchinguids of %s" % (headername, str(matchinguids)))
+         matchinguids.sort()
+         return long(matchinguids[0])
+ 
+diff -ru old//offlineimap/folder/Maildir.py new//offlineimap/folder/Maildir.py
+--- old//offlineimap/folder/Maildir.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/folder/Maildir.py	2010-11-03 10:00:22.740000397 +0100
+@@ -211,7 +211,7 @@
+         attempts = 0
+         while 1:
+             if attempts > 15:
+-                raise IOError, "Couldn't write to file %s" % messagename
++                raise IOError ("Couldn't write to file %s" % messagename)
+             timeval, timeseq = gettimeseq()
+             messagename = '%d_%d.%d.%s,U=%d,FMD5=%s' % \
+                           (timeval,
+diff -ru old//offlineimap/folder/UIDMaps.py new//offlineimap/folder/UIDMaps.py
+--- old//offlineimap/folder/UIDMaps.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/folder/UIDMaps.py	2010-11-03 09:59:54.373333547 +0100
+@@ -155,7 +155,7 @@
+             return uid
+         newluid = self._mb.savemessage(self, -1, content, flags, rtime)
+         if newluid < 1:
+-            raise ValueError, "Backend could not find uid for message"
++            raise ValueError ("Backend could not find uid for message")
+         self.maplock.acquire()
+         try:
+             self.diskl2r[newluid] = uid
+Only in new//offlineimap: imaplibutil.pyc
+diff -ru old//offlineimap/imapserver.py new//offlineimap/imapserver.py
+--- old//offlineimap/imapserver.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/imapserver.py	2010-11-03 09:49:52.916667043 +0100
+@@ -50,7 +50,7 @@
+             return
+         result = self.__class__.__bases__[1].select(self, mailbox, readonly)
+         if result[0] != 'OK':
+-            raise ValueError, "Error from select: %s" % str(result)
++            raise ValueError ("Error from select: %s" % str(result))
+         if self.getstate() == 'SELECTED':
+             self.selectedfolder = mailbox
+         else:
+@@ -203,7 +203,7 @@
+                 rc = kerberos.authGSSClientWrap(self.gss_vc, response,
+                                                 self.username)
+             response = kerberos.authGSSClientResponse(self.gss_vc)
+-        except kerberos.GSSError, err:
++        except kerberos.GSSError as err:
+             # Kerberos errored out on us, respond with None to cancel the
+             # authentication
+             UIBase.getglobalui().debug('imap',
+@@ -275,7 +275,7 @@
+                                 'Attempting GSSAPI authentication')
+                             try:
+                                 imapobj.authenticate('GSSAPI', self.gssauth)
+-                            except imapobj.error, val:
++                            except imapobj.error as val:
+                                 self.gssapi = False
+                                 UIBase.getglobalui().debug('imap',
+                                     'GSSAPI Authentication failed')
+@@ -290,14 +290,14 @@
+                                                        'Attempting CRAM-MD5 authentication')
+                                 try:
+                                     imapobj.authenticate('CRAM-MD5', self.md5handler)
+-                                except imapobj.error, val:
++                                except imapobj.error as val:
+                                     self.plainauth(imapobj)
+                             else:
+                                 self.plainauth(imapobj)
+                         # Would bail by here if there was a failure.
+                         success = 1
+                         self.goodpassword = self.password
+-                    except imapobj.error, val:
++                    except imapobj.error as val:
+                         self.passworderror = str(val)
+                         raise
+                         #self.password = None
+Only in new//offlineimap: imapserver.pyc
+diff -ru old//offlineimap/imaputil.py new//offlineimap/imaputil.py
+--- old//offlineimap/imaputil.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/imaputil.py	2010-11-03 09:57:57.400000334 +0100
+@@ -42,7 +42,7 @@
+ 
+ def flagsplit(string):
+     if string[0] != '(' or string[-1] != ')':
+-        raise ValueError, "Passed string '%s' is not a flag list" % string
++        raise ValueError ("Passed string '%s' is not a flag list" % string)
+     return imapsplit(string[1:-1])
+ 
+ def options2hash(list):
+Only in new//offlineimap: __init__.pyc
+Only in new//offlineimap: init.pyc
+diff -ru old//offlineimap/repository/Base.py new//offlineimap/repository/Base.py
+--- old//offlineimap/repository/Base.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/repository/Base.py	2010-11-03 10:07:33.100000446 +0100
+@@ -33,7 +33,7 @@
+         typemap = {'IMAP': MappedIMAPRepository,
+                    'Maildir': MaildirRepository}
+     else:
+-        raise ValueError, "Request type %s not supported" % reqtype
++        raise ValueError ("Request type %s not supported" % reqtype)
+     config = account.getconfig()
+     repostype = config.get('Repository ' + name, 'type').strip()
+     return typemap[repostype](name, account)
+@@ -47,13 +47,13 @@
+         self.accountname = self.account.getname()
+         self.uiddir = os.path.join(self.config.getmetadatadir(), 'Repository-' + self.name)
+         if not os.path.exists(self.uiddir):
+-            os.mkdir(self.uiddir, 0700)
++            os.mkdir(self.uiddir, 0x0700)
+         self.mapdir = os.path.join(self.uiddir, 'UIDMapping')
+         if not os.path.exists(self.mapdir):
+-            os.mkdir(self.mapdir, 0700)
++            os.mkdir(self.mapdir, 0x0700)
+         self.uiddir = os.path.join(self.uiddir, 'FolderValidity')
+         if not os.path.exists(self.uiddir):
+-            os.mkdir(self.uiddir, 0700)
++            os.mkdir(self.uiddir, 0x0700)
+ 
+     # The 'restoreatime' config parameter only applies to local Maildir
+     # mailboxes.
+diff -ru old//offlineimap/repository/IMAP.py new//offlineimap/repository/IMAP.py
+--- old//offlineimap/repository/IMAP.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/repository/IMAP.py	2010-11-03 10:07:14.523333680 +0100
+@@ -110,7 +110,7 @@
+ 
+         try:
+             netrcentry = netrc.netrc().authentificator(self.gethost())
+-        except IOError, inst:
++        except IOError as inst:
+             if inst.errno != errno.ENOENT:
+                 raise
+         else:
+@@ -119,7 +119,7 @@
+ 
+         try:
+             netrcentry = netrc.netrc('/etc/netrc').authentificator(self.gethost())
+-        except IOError, inst:
++        except IOError as inst:
+             if inst.errno != errno.ENOENT:
+                 raise
+         else:
+@@ -172,7 +172,7 @@
+ 
+         try:
+             netrcentry = netrc.netrc().authenticators(self.gethost())
+-        except IOError, inst:
++        except IOError as inst:
+             if inst.errno != errno.ENOENT:
+                 raise
+         else:
+@@ -182,7 +182,7 @@
+                     return netrcentry[2]
+         try:
+             netrcentry = netrc.netrc('/etc/netrc').authenticators(self.gethost())
+-        except IOError, inst:
++        except IOError as inst:
+             if inst.errno != errno.ENOENT:
+                 raise
+         else:
+@@ -266,7 +266,7 @@
+         try:
+             result = imapobj.create(newname)
+             if result[0] != 'OK':
+-                raise RuntimeError, "Repository %s could not create folder %s: %s" % (self.getname(), foldername, str(result))
++                raise RuntimeError ("Repository %s could not create folder %s: %s" % (self.getname(), foldername, str(result)))
+         finally:
+             self.imapserver.releaseconnection(imapobj)
+             
+diff -ru old//offlineimap/repository/LocalStatus.py new//offlineimap/repository/LocalStatus.py
+--- old//offlineimap/repository/LocalStatus.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/repository/LocalStatus.py	2010-11-03 10:04:18.216666836 +0100
+@@ -26,7 +26,7 @@
+         BaseRepository.__init__(self, reposname, account)
+         self.directory = os.path.join(account.getaccountmeta(), 'LocalStatus')
+         if not os.path.exists(self.directory):
+-            os.mkdir(self.directory, 0700)
++            os.mkdir(self.directory, 0x0700)
+         self.folders = None
+ 
+     def getsep(self):
+diff -ru old//offlineimap/ui/Curses.py new//offlineimap/ui/Curses.py
+--- old//offlineimap/ui/Curses.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/ui/Curses.py	2010-11-03 10:01:27.156666912 +0100
+@@ -507,7 +507,7 @@
+         try:
+             if not s.c.isactive():
+                 # For dumping out exceptions and stuff.
+-                print msg
++                print (msg)
+                 return
+             if color:
+                 s.gettf().setcolor(color)
+@@ -587,7 +587,7 @@
+     import time
+     time.sleep(5)
+     x.stop()
+-    print x.has_color
+-    print x.height
+-    print x.width
++    print (x.has_color)
++    print (x.height)
++    print (x.width)
+ 
+diff -ru old//offlineimap/ui/detector.py new//offlineimap/ui/detector.py
+--- old//offlineimap/ui/detector.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/ui/detector.py	2010-11-03 10:01:40.903333387 +0100
+@@ -48,7 +48,7 @@
+ def getUImod(uistr, localeval, namespace):
+     try:
+         uimod = localeval.eval(uistr, namespace)
+-    except (AttributeError, NameError), e:
++    except (AttributeError, NameError) as e:
+         #raise
+         return None
+     return uimod
+Only in new//offlineimap/ui: __init__.pyc
+diff -ru old//offlineimap/ui/Machine.py new//offlineimap/ui/Machine.py
+--- old//offlineimap/ui/Machine.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/ui/Machine.py	2010-11-03 10:02:59.973333747 +0100
+@@ -43,11 +43,11 @@
+         if dolock:
+             s.outputlock.acquire()
+         try:
+-            print "%s:%s:%s:%s" % \
++            print ("%s:%s:%s:%s" % \
+                     (datatype,
+                      urllib.quote(command, s.safechars), 
+                      urllib.quote(currentThread().getName(), s.safechars),
+-                     urllib.quote(data, s.safechars))
++                     urllib.quote(data, s.safechars)))
+             sys.stdout.flush()
+         finally:
+             if dolock:
+@@ -137,7 +137,7 @@
+                                                       ds))
+ 
+     def threadException(s, thread):
+-        print s.getThreadExceptionString(thread)
++        print (s.getThreadExceptionString(thread))
+         s._printData('threadException', "%s\n%s" % \
+                      (thread.getName(), s.getThreadExceptionString(thread)))
+         s.delThreadDebugLog(thread)
+diff -ru old//offlineimap/ui/Noninteractive.py new//offlineimap/ui/Noninteractive.py
+--- old//offlineimap/ui/Noninteractive.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/ui/Noninteractive.py	2010-11-03 10:06:56.920000283 +0100
+@@ -21,10 +21,10 @@
+ 
+ class Basic(UIBase):
+     def getpass(s, accountname, config, errmsg = None):
+-        raise NotImplementedError, "Prompting for a password is not supported in noninteractive mode."
++        raise NotImplementedError ("Prompting for a password is not supported in noninteractive mode.")
+ 
+     def _display(s, msg):
+-        print msg
++        print (msg)
+         sys.stdout.flush()
+ 
+     def warn(s, msg, minor = 0):
+diff -ru old//offlineimap/ui/TTY.py new//offlineimap/ui/TTY.py
+--- old//offlineimap/ui/TTY.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/ui/TTY.py	2010-11-03 10:03:29.790000340 +0100
+@@ -34,9 +34,9 @@
+         s.outputlock.acquire()
+         try:
+             if (currentThread().getName() == 'MainThread'):
+-                print msg
++                print (msg)
+             else:
+-                print "%s:\n   %s" % (currentThread().getName(), msg)
++                print ("%s:\n   %s" % (currentThread().getName(), msg))
+             sys.stdout.flush()
+         finally:
+             s.outputlock.release()
+diff -ru old//offlineimap/ui/UIBase.py new//offlineimap/ui/UIBase.py
+--- old//offlineimap/ui/UIBase.py	2010-06-29 23:52:54.000000000 +0200
++++ new//offlineimap/ui/UIBase.py	2010-11-03 10:06:45.970000333 +0100
+@@ -81,9 +81,9 @@
+         """Provides a hint to UIs about which account this particular
+         thread is processing."""
+         if s.threadaccounts.has_key(threading.currentThread()):
+-            raise ValueError, "Thread %s already registered (old %s, new %s)" %\
++            raise ValueError ("Thread %s already registered (old %s, new %s)" %\
+                   (threading.currentThread().getName(),
+-                   s.getthreadaccount(s), account)
++                   s.getthreadaccount(s), account))
+         s.threadaccounts[threading.currentThread()] = account
+ 
+     def unregisterthread(s, thr):
+@@ -129,7 +129,7 @@
+         s.warn("Invalid debug type: %s" % debugtype)
+ 
+     def locked(s):
+-        raise Exception, "Another OfflineIMAP is running with the same metadatadir; exiting."
++        raise Exception ("Another OfflineIMAP is running with the same metadatadir; exiting.")
+ 
+     def getnicename(s, object):
+         prelimname = str(object.__class__).split('.')[-1]
+@@ -310,8 +310,8 @@
+ 
+     def terminate(s, exitstatus = 0, errortitle = None, errormsg = None):
+         """Called to terminate the application."""
+-        if errormsg <> None:
+-            if errortitle <> None:
++        if errormsg != None:
++            if errortitle != None:
+                 sys.stderr.write('ERROR: %s\n\n%s\n'%(errortitle, errormsg))
+             else:
+                 sys.stderr.write('%s\n' % errormsg)
+Only in new//offlineimap: version.pyc

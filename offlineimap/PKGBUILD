@@ -6,7 +6,7 @@
 
 pkgname=offlineimap
 pkgver=6.2.0.2
-pkgrel=1
+pkgrel=2
 pkgdesc='A powerful IMAP/Maildir synchronization tool'
 arch=('i686' 'x86_64')
 url='http://software.complete.org/offlineimap/'
@@ -14,17 +14,17 @@ license=('GPL')
 depends=('python')
 noextract=($pkgname.1.gz)
 source=(http://github.com/jgoerzen/offlineimap/tarball/debian/${pkgver}/offlineimap.tgz \
-        $pkgname.1.gz)
-
-md5sums=('e1a01b6b1c1a70a1afaefb0a20634bc1'
-         '0213e6f5d032be2ec8eedfbb52134ef3')
+        $pkgname.1.gz \
+        01-python3-raise-syntax.diff )
 
 releasename=jgoerzen-offlineimap-0f1a667
 
 build() {
   cd ${srcdir}/$releasename
 
-  python setup.py build install --root=${pkgdir} || return 1
+  patch -p1 < ${srcdir}/01-python3-raise-syntax.diff || return 1
+
+  python2 setup.py build install --root=${pkgdir} || return 1
 
   install -D -m644 $pkgname.conf.minimal ${pkgdir}/usr/share/$pkgname/$pkgname.conf.minimal || return 1
   install -D -m644 $pkgname.conf ${pkgdir}/usr/share/$pkgname/$pkgname.conf || return 1
@@ -33,3 +33,7 @@ build() {
 #extracted from debian package: http://ftp.debian.org/debian/pool/main/o/offlineimap/offlineimap_6.2.0_all.deb
   install -D -m644 ${srcdir}/$pkgname.1.gz ${pkgdir}/usr/share/man/man1/$pkgname.1.gz || return 1
 }
+
+md5sums=('e1a01b6b1c1a70a1afaefb0a20634bc1'
+         '0213e6f5d032be2ec8eedfbb52134ef3'
+         '3b9d3d0b1f274140265c45d11594f0c5')
