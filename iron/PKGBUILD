@@ -1,0 +1,61 @@
+# Maintainer: Brad Fanella <bradfanella@archlinux.us>
+pkgname=iron
+pkgver=6.0.475.1
+pkgrel=2
+pkgdesc="A fast web browser based on chromium without Google's tracking 'features'"
+arch=('i686' 'x86_64')
+url="http://www.srware.net/en/software_srware_iron.php"
+license=('BSD')
+depends=('alsa-lib' 'libjpeg6' 'libpng12' 'nss' 'ttf-dejavu' 'libxss' 'gconf')
+provides=("chromium=$pkgver")
+install=$pkgname.install
+
+source=(http://www.srware.net/downloads/$pkgname-linux.tar.gz
+        $pkgname{.desktop,.png,.sh} LICENSE)
+
+md5sums=('4e59b87056888974454431e08a59651f'
+         'c2eb1e61227db7705a40b93c63d551a0'
+         '60df76c38381e46577505b0c61cea017'
+         '6ec430e5597388492b413b152c9587ac'
+         '30032c6c531632af6547fa360395acd3')
+
+sha256sums=('c6f3f39d55ac35dd8a58b39de69fd29152e594dcb12ba96a33d7fd3329ed3278'
+            'd4b7e0057e754d6e0c8c9c116103df2e4a36169b93679dd0bd6338ee51a5bcbf'
+            '77c29198ff3079f4be5469023a5317c18dd7ef9ce34efd3ae4ca0be09d5de285'
+            '746148eba30c710dd2ad091afae102bf609501ebbdf8e2633cc88f2fe5262189'
+            'ec68693372a025d4cba5214a0b97c66ae62025c80cc34ef6c01c92b32bd0f2d6')
+
+# x86_64 source
+if [[ $CARCH == x86_64 ]]; then
+	source[0]=http://www.srware.net/downloads/$pkgname-linux-64.tar.gz
+	md5sums[0]='24fce64e292e06c0e84280a08fd41840'
+sha256sums[0]='5310024dd08d24eac6edbe6114ecc89ab9685879536adbe76aca631eef72e6f8'
+
+fi
+
+build() {
+	cd ${srcdir}
+}
+
+package() {
+	cd ${srcdir}
+	install -Dm755 $pkgname.sh "$pkgdir/usr/bin/$pkgname"
+        install -d "$pkgdir/opt"
+
+        local suffix=
+        [[ $CARCH = x86_64 ]] && suffix=-64
+ 
+        mv iron-linux$suffix "$pkgdir/opt/$pkgname"
+        rm -f "$pkgdir/opt/$pkgname/"{product_logo_48.png, README, xdg-settings}
+
+        ln -s /lib/libBrokenLocale.so.1 "$pkgdir/opt/$pkgname/libgconf-2.so.4"
+
+        find "$pkgdir/opt/$pkgname/" -type f -exec chmod 644 {} +
+        find "$pkgdir/opt/$pkgname/" -type d -exec chmod 755 {} +
+        chmod a+x "$pkgdir/opt/$pkgname/$pkgname"
+        chmod a+x "$pkgdir/opt/$pkgname/libffmpegsumo.so"
+ 
+        install -Dm644 $pkgname.png "$pkgdir/usr/share/pixmaps/$pkgname.png"
+        install -Dm644 $pkgname.desktop "$pkgdir/usr/share/applications/$pkgname.desktop"
+        install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
