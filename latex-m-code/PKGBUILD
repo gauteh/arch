@@ -1,0 +1,20 @@
+# Author: Gaute Hope <eg@gaute.vetsj.com>
+
+pkgname=latex-m-code
+pkgver=1.9
+pkgrel=1
+pkgdesc="Matlab style for latex"
+arch=('i686 x86_64')
+url="http://www.mathworks.com/matlabcentral/fileexchange/8015-m-code-latex-package"
+license=('BSD')
+install=texlive.install
+source=("http://www.mathworks.com/matlabcentral/fileexchange/8015-m-code-latex-package?controller=file_infos&download=true/mcode-${pkgver}.zip")
+
+build() {
+  cd "${srcdir}"
+  mkdir -p "${pkgdir}/usr/share/texmf-dist/tex/latex/m-code/"
+  cp -r mcode.sty license.txt "${pkgdir}/usr/share/texmf-dist/tex/latex/m-code/"
+}
+
+md5sums=('6d7d1a2b1b9dac111eae1b19aa9ff33a')
+
