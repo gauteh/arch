@@ -39,6 +39,9 @@ build()
   cd ${pkgdir}/opt/cwp/Sfio
   make clean
 
+  cd ${pkgdir}/opt/cwp/src/Sfio
+  make clean
+
   # set up environment
   mkdir -p ${pkgdir}/etc/profile.d
   install -m 755 ${srcdir}/cwp.sh ${pkgdir}/etc/profile.d/
