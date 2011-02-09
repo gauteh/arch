@@ -1,0 +1,45 @@
+# Packager : Gaute Hope <eg@gaute.vetsj.com>
+
+pkgname=seismic-unix
+pkgver=42
+pkgrel=1
+pkgdesc="Seismic data processing package"
+arch=(x86_64)
+url="http://www.cwp.mines.edu/cwpcodes/"
+depends=('lesstif')
+source=("ftp://ftp.cwp.mines.edu/pub/cwpcodes/cwp_su_all_${pkgver}.tgz" 01-makefile.patch cwp.sh)
+license=('BSD AS-IS')
+
+build()
+{
+  cd ${srcdir}
+  patch -p1 < ${srcdir}/01-makefile.patch
+
+  mkdir -p ${pkgdir}/opt/cwp
+
+  echo "Copy sources to package root.."
+  cp -r ${srcdir}/{Sfio,src} ${pkgdir}/opt/cwp/
+  export CWPROOT=${pkgdir}/opt/cwp
+
+  # accept LICENSE og MAIL
+  echo "Accepting license and marking mail as sent.."
+  touch ${pkgdir}/opt/cwp/src/LICENSE_${pkgver}_ACCEPTED
+  touch ${pkgdir}/opt/cwp/src/MAILHOME_${pkgver}
+
+  cd ${pkgdir}/opt/cwp/src/
+  make install
+  make xtinstall
+  make finstall
+  make mglinstall
+  make utils
+  make xminstall
+  make sfinstall
+
+  # set up environment
+  mkdir -p ${pkgdir}/etc/profile.d
+  install -m 755 ${srcdir}/cwp.sh ${pkgdir}/etc/profile.d/
+}
+
+md5sums=('258bb2b5a2617af7b3e35ff214802f60'
+         '3948a7db40e5f7b423cc45bd1b3df191'
+         '7b793b94d4ec193b1b679de383fb4ab6')

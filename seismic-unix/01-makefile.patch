@@ -1,0 +1,18 @@
+diff -ru old/src/chkroot.sh new/src/chkroot.sh
+--- old/src/chkroot.sh	2001-12-10 18:12:45.000000000 +0100
++++ new/src/chkroot.sh	2011-02-08 19:35:08.583333345 +0100
+@@ -15,14 +15,4 @@
+ fi
+ 
+ echo "Installing the CWP codes under the ROOT = ${CWPROOT}"
+-echo "Continue install? [y/n] "  | tr -d "\012"
+-	read RESP
+-		case $RESP in
+-			y*|Y*) # continue
+-			;;
+-			*) # abort
+-	
+-				echo "Aborting make " ; exit 1
+-			;;
+-		esac
+ exit 0
