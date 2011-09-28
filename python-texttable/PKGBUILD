@@ -1,0 +1,19 @@
+# Contributor: rich_o <rich_o@lavabit.com>
+# Contributor: Gaute Hope <eg@ŋaute.vetsj.com> 
+pkgname=python-texttable
+pkgver=0.7.0
+pkgrel=1
+pkgdesc="Generate a formatted text table, using ASCII characters."
+arch=('i686' 'x86_64')
+url="http://foutaise.org/code/texttable/"
+license=('LGPL')
+depends=('python')
+source=(http://foutaise.org/code/texttable/texttable-${pkgver}.tar.gz)
+md5sums=('d37674911f2937b450291791e4a6ffad')
+
+build() {
+  cd "$srcdir/texttable-$pkgver"
+  python2 setup.py build || return 1
+  python2 setup.py install --root="$pkgdir" || return 1
+}
+
