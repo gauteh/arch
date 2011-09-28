@@ -9,7 +9,7 @@ url="http://foutaise.org/code/texttable/"
 license=('LGPL')
 depends=('python')
 source=(http://foutaise.org/code/texttable/texttable-${pkgver}.tar.gz)
-md5sums=('d37674911f2937b450291791e4a6ffad')
+md5sums=('b793fcadd663292527a8d5ca418b74ef')
 
 build() {
   cd "$srcdir/texttable-$pkgver"
