@@ -1,5 +1,4 @@
 # Contributor: rich_o <rich_o@lavabit.com>
-# Contributor: Gaute Hope <eg@ŋaute.vetsj.com> 
 pkgname=python-texttable
 pkgver=0.7.0
 pkgrel=1
