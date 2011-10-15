@@ -11,10 +11,12 @@ depends=('avr-libc' 'libusb-compat' 'java-runtime')
 install="arduino.install"
 source=("http://arduino.googlecode.com/files/arduino-$pkgver.tgz"
 	"http://arduino.googlecode.com/files/arduino-$pkgver-64-2.tgz"
+  "http://arduino.cc/playground/uploads/OpenBSD/arduino_core.patch.txt"
 	'arduino'
 	'arduino.png'
 	'arduino.desktop'
 	'gcc-avr-progmem.patch')
+
 md5sums=('2429c118381a4a761d7f5717183ac387' 'b332c75e3e63959908751adcafd0248d' '551304dc658224c867513f6099075f0e' '9e36d33891d5e68d38ec55d1494499a5' 'eebc4d6495864bea99ad057af801afb9' '02d54a77bd451ad1b62513f5a60b39cc')
 
 if   [ "$CARCH" == 'i686' ]; then
