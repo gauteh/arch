@@ -1,0 +1,164 @@
+diff -ru old/hardware/arduino/cores/arduino/pins_arduino.c new/hardware/arduino/cores/arduino/pins_arduino.c
+--- old/hardware/arduino/cores/arduino/pins_arduino.c	2011-02-16 16:56:11.000000000 +0100
++++ new/hardware/arduino/cores/arduino/pins_arduino.c	2011-10-15 19:39:47.939441000 +0200
+@@ -81,50 +81,50 @@
+ #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+ const uint16_t PROGMEM port_to_mode_PGM[] = {
+ 	NOT_A_PORT,
+-	&DDRA,
+-	&DDRB,
+-	&DDRC,
+-	&DDRD,
+-	&DDRE,
+-	&DDRF,
+-	&DDRG,
+-	&DDRH,
++	(int)&DDRA,
++	(int)&DDRB,
++	(int)&DDRC,
++	(int)&DDRD,
++	(int)&DDRE,
++	(int)&DDRF,
++	(int)&DDRG,
++	(int)&DDRH,
+ 	NOT_A_PORT,
+-	&DDRJ,
+-	&DDRK,
+-	&DDRL,
++	(int)&DDRJ,
++	(int)&DDRK,
++	(int)&DDRL,
+ };
+ 
+ const uint16_t PROGMEM port_to_output_PGM[] = {
+ 	NOT_A_PORT,
+-	&PORTA,
+-	&PORTB,
+-	&PORTC,
+-	&PORTD,
+-	&PORTE,
+-	&PORTF,
+-	&PORTG,
+-	&PORTH,
++	(int)&PORTA,
++	(int)&PORTB,
++	(int)&PORTC,
++	(int)&PORTD,
++	(int)&PORTE,
++	(int)&PORTF,
++	(int)&PORTG,
++	(int)&PORTH,
+ 	NOT_A_PORT,
+-	&PORTJ,
+-	&PORTK,
+-	&PORTL,
++	(int)&PORTJ,
++	(int)&PORTK,
++	(int)&PORTL,
+ };
+ 
+ const uint16_t PROGMEM port_to_input_PGM[] = {
+ 	NOT_A_PIN,
+-	&PINA,
+-	&PINB,
+-	&PINC,
+-	&PIND,
+-	&PINE,
+-	&PINF,
+-	&PING,
+-	&PINH,
++	(int)&PINA,
++	(int)&PINB,
++	(int)&PINC,
++	(int)&PIND,
++	(int)&PINE,
++	(int)&PINF,
++	(int)&PING,
++	(int)&PINH,
+ 	NOT_A_PIN,
+-	&PINJ,
+-	&PINK,
+-	&PINL,
++	(int)&PINJ,
++	(int)&PINK,
++	(int)&PINL,
+ };
+ 
+ const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
+@@ -358,25 +358,25 @@
+ const uint16_t PROGMEM port_to_mode_PGM[] = {
+ 	NOT_A_PORT,
+ 	NOT_A_PORT,
+-	&DDRB,
+-	&DDRC,
+-	&DDRD,
++	(int)&DDRB,
++	(int)&DDRC,
++	(int)&DDRD,
+ };
+ 
+ const uint16_t PROGMEM port_to_output_PGM[] = {
+ 	NOT_A_PORT,
+ 	NOT_A_PORT,
+-	&PORTB,
+-	&PORTC,
+-	&PORTD,
++	(int)&PORTB,
++	(int)&PORTC,
++	(int)&PORTD,
+ };
+ 
+ const uint16_t PROGMEM port_to_input_PGM[] = {
+ 	NOT_A_PORT,
+ 	NOT_A_PORT,
+-	&PINB,
+-	&PINC,
+-	&PIND,
++	(int)&PINB,
++	(int)&PINC,
++	(int)&PIND,
+ };
+ 
+ const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
+diff -ru old/hardware/arduino/cores/arduino/wiring.c new/hardware/arduino/cores/arduino/wiring.c
+--- old/hardware/arduino/cores/arduino/wiring.c	2011-02-16 16:56:11.000000000 +0100
++++ new/hardware/arduino/cores/arduino/wiring.c	2011-10-15 19:37:26.679445195 +0200
+@@ -287,3 +287,4 @@
+ 	UCSR0B = 0;
+ #endif
+ }
++
+diff -ru old/hardware/arduino/cores/arduino/wiring_private.h new/hardware/arduino/cores/arduino/wiring_private.h
+--- old/hardware/arduino/cores/arduino/wiring_private.h	2011-02-16 16:56:11.000000000 +0100
++++ new/hardware/arduino/cores/arduino/wiring_private.h	2011-10-15 19:37:26.682778529 +0200
+@@ -27,7 +27,7 @@
+ 
+ #include <avr/io.h>
+ #include <avr/interrupt.h>
+-#include <avr/delay.h>
++#include <util/delay.h>
+ #include <stdio.h>
+ #include <stdarg.h>
+ 
+diff -ru old/hardware/arduino/cores/arduino/WMath.cpp new/hardware/arduino/cores/arduino/WMath.cpp
+--- old/hardware/arduino/cores/arduino/WMath.cpp	2011-02-16 16:56:12.000000000 +0100
++++ new/hardware/arduino/cores/arduino/WMath.cpp	2011-10-15 19:37:26.682778529 +0200
+@@ -57,4 +57,5 @@
+ }
+ 
+ unsigned int makeWord(unsigned int w) { return w; }
+-unsigned int makeWord(unsigned char h, unsigned char l) { return (h << 8) | l; }
+\ No newline at end of file
++unsigned int makeWord(unsigned char h, unsigned char l) { return (h << 8) | l; }
++
+diff -ru old/hardware/arduino/cores/arduino/WProgram.h new/hardware/arduino/cores/arduino/WProgram.h
+--- old/hardware/arduino/cores/arduino/WProgram.h	2011-02-16 16:56:11.000000000 +0100
++++ new/hardware/arduino/cores/arduino/WProgram.h	2011-10-15 19:37:26.682778529 +0200
+@@ -60,4 +60,5 @@
+ 
+ #endif
+ 
+-#endif
+\ No newline at end of file
++#endif
++
