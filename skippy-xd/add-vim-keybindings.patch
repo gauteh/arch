@@ -1,0 +1,545 @@
+diff -u old/clientwin.c new/clientwin.c
+--- old/clientwin.c	2004-05-19 23:00:31.000000000 +0200
++++ new/clientwin.c	2011-11-03 18:31:03.114437207 +0100
+@@ -35,14 +35,14 @@
+ 	ClientWin *cw = (ClientWin *)l->data;
+ 	CARD32 desktop = (*(CARD32*)data),
+ 		w_desktop = wm_get_window_desktop(cw->mainwin->dpy, cw->client.window);
+-	
++
+ #ifdef XINERAMA
+ 	if(cw->mainwin->xin_active && ! INTERSECTS(cw->client.x, cw->client.y, cw->client.width, cw->client.height,
+ 	                                           cw->mainwin->xin_active->x_org, cw->mainwin->xin_active->y_org,
+ 	                                           cw->mainwin->xin_active->width, cw->mainwin->xin_active->height))
+ 		return 0;
+ #endif
+-	
++
+ 	return (w_desktop == (CARD32)-1 || desktop == w_desktop) &&
+ 	       wm_validate_window(cw->mainwin->dpy, cw->client.window);
+ }
+@@ -69,7 +69,7 @@
+ 	XSetWindowAttributes sattr;
+ 	XWindowAttributes attr;
+ 	XRenderPictureAttributes pa;
+-	
++
+ 	cw->mainwin = mw;
+ 	cw->pixmap = None;
+ 	cw->focused = 0;
+@@ -77,10 +77,10 @@
+ 	cw->damage = None;
+ 	cw->damaged = False;
+ 	/* cw->repair = None; */
+-	
++
+ 	sattr.border_pixel = sattr.background_pixel = 0;
+ 	sattr.colormap = mw->colormap;
+-	
++
+ 	sattr.event_mask = ButtonPressMask |
+ 	                   ButtonReleaseMask |
+ 	                   KeyReleaseMask |
+@@ -89,31 +89,31 @@
+ 	                   PointerMotionMask |
+ 	                   ExposureMask |
+ 	                   FocusChangeMask;
+-	
++
+ 	sattr.override_redirect = mw->lazy_trans;
+-	
++
+ 	cw->client.window = client;
+ 	cw->mini.format = mw->format;
+ 	cw->mini.window = XCreateWindow(mw->dpy, mw->lazy_trans ? mw->root : mw->window, 0, 0, 1, 1, 0,
+ 	                                mw->depth, InputOutput, mw->visual,
+ 	                                CWColormap | CWBackPixel | CWBorderPixel | CWEventMask | CWOverrideRedirect, &sattr);
+-	
++
+ 	if(cw->mini.window == None)
+ 	{
+ 		free(cw);
+ 		return 0;
+ 	}
+-	
++
+ 	XGetWindowAttributes(mw->dpy, client, &attr);
+ 	cw->client.format = XRenderFindVisualFormat(mw->dpy, attr.visual);
+-	
++
+ 	pa.subwindow_mode = IncludeInferiors;
+ 	cw->origin = XRenderCreatePicture (cw->mainwin->dpy, cw->client.window, cw->client.format, CPSubwindowMode, &pa);
+-	
++
+ 	XRenderSetPictureFilter(cw->mainwin->dpy, cw->origin, FilterBest, 0, 0);
+-	
++
+ 	XSelectInput(cw->mainwin->dpy, cw->client.window, SubstructureNotifyMask | StructureNotifyMask);
+-	
++
+ 	return cw;
+ }
+ 
+@@ -122,18 +122,18 @@
+ {
+ 	Window tmpwin;
+ 	XWindowAttributes wattr;
+-	
++
+ 	XGetWindowAttributes(cw->mainwin->dpy, cw->client.window, &wattr);
+-	
++
+ 	cw->client.format = XRenderFindVisualFormat(cw->mainwin->dpy, wattr.visual);
+ 	XTranslateCoordinates(cw->mainwin->dpy, cw->client.window, wattr.root,
+ 		                      -wattr.border_width,
+ 		                      -wattr.border_width,
+ 		                      &cw->client.x, &cw->client.y, &tmpwin);
+-	
++
+ 	cw->client.width = wattr.width;
+ 	cw->client.height = wattr.height;
+-	
++
+ 	cw->mini.x = cw->mini.y = 0;
+ 	cw->mini.width = cw->mini.height = 1;
+ }
+@@ -152,9 +152,9 @@
+ 		XRenderFreePicture(cw->mainwin->dpy, cw->destination);
+ 	if(cw->pixmap != None)
+ 		XFreePixmap(cw->mainwin->dpy, cw->pixmap);
+-	
++
+ 	XDestroyWindow(cw->mainwin->dpy, cw->mini.window);
+-	
++
+ 	free(cw);
+ }
+ 
+@@ -166,7 +166,7 @@
+ 	    s_y = (double)rect->y * cw->factor,
+ 	    s_w = (double)rect->width * cw->factor,
+ 	    s_h = (double)rect->height * cw->factor;
+-	
++
+ 	if(cw->mainwin->lazy_trans)
+ 	{
+ 		XRenderComposite(cw->mainwin->dpy, PictOpSrc, cw->origin,
+@@ -180,10 +180,10 @@
+ 		                 cw->focused ? cw->mainwin->highlightPicture : cw->mainwin->normalPicture,
+ 		                 cw->destination, s_x, s_y, 0, 0, s_x, s_y, s_w, s_h);
+ 	}
+-	
++
+ 	if(tint->alpha)
+ 		XRenderFillRectangle(cw->mainwin->dpy, PictOpOver, cw->destination, tint, s_x, s_y, s_w, s_h);
+-	
++
+ 	XClearArea(cw->mainwin->dpy, cw->mini.window, s_x, s_y, s_w, s_h, False);
+ }
+ 
+@@ -203,18 +203,18 @@
+ 	int nrects, i;
+ 	XRectangle *rects;
+ 	XserverRegion rgn = XFixesCreateRegion(cw->mainwin->dpy, 0, 0);
+-	
++
+ 	XDamageSubtract(cw->mainwin->dpy, cw->damage, None, rgn);
+-	
++
+ 	rects = XFixesFetchRegion(cw->mainwin->dpy, rgn, &nrects);
+ 	XFixesDestroyRegion(cw->mainwin->dpy, rgn);
+-	
++
+ 	for(i = 0; i < nrects; i++)
+ 		clientwin_repaint(cw, &rects[i]);
+-	
++
+ 	if(rects)
+ 		XFree(rects);
+-	
++
+ 	cw->damaged = False;
+ }
+ 
+@@ -230,7 +230,7 @@
+ 	/* int border = MAX(1, (double)DISTANCE(cw->mainwin) * f * 0.25); */
+ 	int border = 0;
+ 	XSetWindowBorderWidth(cw->mainwin->dpy, cw->mini.window, border);
+-	
++
+ 	cw->factor = f;
+ 	cw->mini.x = x + (int)cw->x * f;
+ 	cw->mini.y = y + (int)cw->y * f;
+@@ -242,16 +242,16 @@
+ 	cw->mini.width = MAX(1, (int)cw->client.width * f);
+ 	cw->mini.height = MAX(1, (int)cw->client.height * f);
+ 	XMoveResizeWindow(cw->mainwin->dpy, cw->mini.window, cw->mini.x - border, cw->mini.y - border, cw->mini.width, cw->mini.height);
+-	
++
+ 	if(cw->pixmap)
+ 		XFreePixmap(cw->mainwin->dpy, cw->pixmap);
+-	
++
+ 	if(cw->destination)
+ 		XRenderFreePicture(cw->mainwin->dpy, cw->destination);
+-	
++
+ 	cw->pixmap = XCreatePixmap(cw->mainwin->dpy, cw->mini.window, cw->mini.width, cw->mini.height, cw->mainwin->depth);
+ 	XSetWindowBackgroundPixmap(cw->mainwin->dpy, cw->mini.window, cw->pixmap);
+-	
++
+ 	cw->destination = XRenderCreatePicture(cw->mainwin->dpy, cw->pixmap, cw->mini.format, 0, 0);
+ }
+ 
+@@ -260,12 +260,12 @@
+ {
+ 	if(cw->damage)
+ 		XDamageDestroy(cw->mainwin->dpy, cw->damage);
+-	
++
+ 	cw->damage = XDamageCreate(cw->mainwin->dpy, cw->client.window, XDamageReportDeltaRectangles);
+ 	XRenderSetPictureTransform(cw->mainwin->dpy, cw->origin, &cw->mainwin->transform);
+-	
++
+ 	clientwin_render(cw);
+-	
++
+ 	XMapWindow(cw->mainwin->dpy, cw->mini.window);
+ }
+ 
+@@ -277,22 +277,22 @@
+ 		XDamageDestroy(cw->mainwin->dpy, cw->damage);
+ 		cw->damage = None;
+ 	}
+-	
++
+ 	if(cw->destination)
+ 	{
+ 		XRenderFreePicture(cw->mainwin->dpy, cw->destination);
+ 		cw->destination = None;
+ 	}
+-	
++
+ 	if(cw->pixmap)
+ 	{
+ 		XFreePixmap(cw->mainwin->dpy, cw->pixmap);
+ 		cw->pixmap = None;
+ 	}
+-	
++
+ 	XUnmapWindow(cw->mainwin->dpy, cw->mini.window);
+ 	XSetWindowBackgroundPixmap(cw->mainwin->dpy, cw->mini.window, None);
+-	
++
+ 	cw->focused = 0;
+ }
+ 
+@@ -313,13 +313,13 @@
+ 		cw->mainwin->pressed = 0;
+ 		return 1;
+ 	} else if(ev->type == KeyRelease) {
+-		if(ev->xkey.keycode == cw->mainwin->key_up)
++		if(ev->xkey.keycode == cw->mainwin->key_up || ev->xkey.keycode == cw->mainwin->key_up_alt)
+ 			focus_up(cw);
+-		else if(ev->xkey.keycode == cw->mainwin->key_down)
++		else if(ev->xkey.keycode == cw->mainwin->key_down || ev->xkey.keycode == cw->mainwin->key_down_alt)
+ 			focus_down(cw);
+-		else if(ev->xkey.keycode == cw->mainwin->key_left)
++		else if(ev->xkey.keycode == cw->mainwin->key_left || ev->xkey.keycode == cw->mainwin->key_left_alt)
+ 			focus_left(cw);
+-		else if(ev->xkey.keycode == cw->mainwin->key_right)
++		else if(ev->xkey.keycode == cw->mainwin->key_right || ev->xkey.keycode == cw->mainwin->key_right_alt)
+ 			focus_right(cw);
+ 		else if(ev->xkey.keycode == cw->mainwin->key_enter || ev->xkey.keycode == cw->mainwin->key_space) {
+ 			childwin_focus(cw);
+diff -u old/mainwin.c new/mainwin.c
+--- old/mainwin.c	2004-05-19 23:00:31.000000000 +0200
++++ new/mainwin.c	2011-11-03 18:31:01.031103848 +0100
+@@ -29,11 +29,11 @@
+     int			i;
+     XRenderPictFormat	*format;
+     Visual		*visual;
+-    
++
+     template.screen = scr;
+     template.depth = 32;
+     template.class = TrueColor;
+-    xvi = XGetVisualInfo (dpy, 
++    xvi = XGetVisualInfo (dpy,
+ 			  VisualScreenMask |
+ 			  VisualDepthMask |
+ 			  VisualClassMask,
+@@ -70,9 +70,9 @@
+ #ifdef XINERAMA
+ 	int event_base;
+ #endif /* XINERAMA */
+-	
++
+ 	MainWin *mw = (MainWin *)malloc(sizeof(MainWin));
+-	
++
+ 	mw->dpy = dpy;
+ 	mw->screen = DefaultScreen(dpy);
+ 	mw->root = RootWindow(dpy, mw->screen);
+@@ -100,7 +100,7 @@
+ 	mw->xin_info = mw->xin_active = 0;
+ 	mw->xin_screens = 0;
+ #endif /* XINERAMA */
+-	
++
+ 	mw->pressed = mw->focus = 0;
+ 	mw->tooltip = 0;
+ 	mw->cod = 0;
+@@ -108,21 +108,27 @@
+ 	mw->key_down = XKeysymToKeycode(dpy, XK_Down);
+ 	mw->key_left = XKeysymToKeycode(dpy, XK_Left);
+ 	mw->key_right = XKeysymToKeycode(dpy, XK_Right);
++
++	mw->key_up_alt = XKeysymToKeycode(dpy, XK_k);
++	mw->key_down_alt = XKeysymToKeycode(dpy, XK_j);
++	mw->key_left_alt = XKeysymToKeycode(dpy, XK_h);
++	mw->key_right_alt = XKeysymToKeycode(dpy, XK_l);
++
+ 	mw->key_enter = XKeysymToKeycode(dpy, XK_Return);
+ 	mw->key_space = XKeysymToKeycode(dpy, XK_space);
+ 	mw->key_escape = XKeysymToKeycode(dpy, XK_Escape);
+ 	mw->key_q = XKeysymToKeycode(dpy, XK_q);
+-	
++
+ 	XGetWindowAttributes(dpy, mw->root, &rootattr);
+ 	mw->x = mw->y = 0;
+ 	mw->width = rootattr.width;
+ 	mw->height = rootattr.height;
+-	
++
+ 	wattr.colormap = mw->colormap;
+ 	wattr.background_pixel = wattr.border_pixel = 0;
+ 	wattr.event_mask = VisibilityChangeMask |
+ 	                   ButtonReleaseMask;
+-	
++
+ 	mw->window = XCreateWindow(dpy, mw->root, 0, 0, mw->width, mw->height, 0,
+ 	                           mw->depth, InputOutput, mw->visual,
+ 	                           CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &wattr);
+@@ -130,7 +136,7 @@
+ 		free(mw);
+ 		return 0;
+ 	}
+-	
++
+ #ifdef XINERAMA
+ # ifdef DEBUG
+ 	fprintf(stderr, "--> checking for Xinerama extension... ");
+@@ -146,7 +152,7 @@
+ 	        fprintf(stderr, "yes\n--> fetching Xinerama info... ");
+ # endif /* DEBUG */
+ 	        mw->xin_info = XineramaQueryScreens(mw->dpy, &mw->xin_screens);
+-# ifdef DEBUG	        
++# ifdef DEBUG
+ 		fprintf(stderr, "done (%i screens)\n", mw->xin_screens);
+ # endif /* DEBUG */
+ 	    }
+@@ -160,39 +166,39 @@
+ 	    fprintf(stderr, "no\n");
+ # endif /* DEBUG */
+ #endif /* XINERAMA */
+-	
++
+ 	if(! XDamageQueryExtension (dpy, &mw->damage_event_base, &error_base))
+ 	{
+ 		fprintf(stderr, "FATAL: XDamage extension not found.\n");
+ 		exit(1);
+ 	}
+-	
++
+ 	if(! XCompositeQueryExtension(dpy, &event_base, &error_base))
+ 	{
+ 		fprintf(stderr, "FATAL: XComposite extension not found.\n");
+ 		exit(1);
+ 	}
+-	
++
+ 	if(! XRenderQueryExtension(dpy, &event_base, &error_base))
+ 	{
+ 		fprintf(stderr, "FATAL: XRender extension not found.\n");
+ 		exit(1);
+ 	}
+-	
++
+ 	if(! XFixesQueryExtension(dpy, &event_base, &error_base))
+ 	{
+ 		fprintf(stderr, "FATAL: XFixes extension not found.\n");
+ 		exit(1);
+ 	}
+-	
++
+ 	XCompositeRedirectSubwindows (mw->dpy, mw->root, CompositeRedirectAutomatic);
+-	
++
+ 	tmp_d = strtod(config_get(config, "general", "updateFreq", "10.0"), 0);
+ 	if(tmp_d != 0.0)
+ 		mw->poll_time = (1.0 / tmp_d) * 1000.0;
+ 	else
+ 		mw->poll_time = 0;
+-	
++
+ 	tmp = config_get(config, "normal", "tint", "black");
+ 	if(! XParseColor(mw->dpy, mw->colormap, tmp, &exact_color))
+ 	{
+@@ -206,7 +212,7 @@
+ 		mw->normalTint.blue = exact_color.blue;
+ 	}
+ 	mw->normalTint.alpha = MAX(0, MIN(strtol(config_get(config, "normal", "tintOpacity", "0"), 0, 0) * 256, 65535));
+-	
++
+ 	tmp = config_get(config, "highlight", "tint", "#101020");
+ 	if(! XParseColor(mw->dpy, mw->colormap, tmp, &exact_color))
+ 	{
+@@ -221,24 +227,24 @@
+ 		mw->highlightTint.blue = exact_color.blue;
+ 	}
+ 	mw->highlightTint.alpha = MAX(0, MIN(strtol(config_get(config, "highlight", "tintOpacity", "64"), 0, 0) * 256, 65535));
+-	
++
+ 	pa.repeat = True;
+ 	clear.alpha = MAX(0, MIN(strtol(config_get(config, "normal", "opacity", "200"), 0, 10) * 256, 65535));
+ 	mw->normalPixmap = XCreatePixmap(mw->dpy, mw->window, 1, 1, 8);
+ 	mw->normalPicture = XRenderCreatePicture(mw->dpy, mw->normalPixmap, XRenderFindStandardFormat(mw->dpy, PictStandardA8), CPRepeat, &pa);
+ 	XRenderFillRectangle(mw->dpy, PictOpSrc, mw->normalPicture, &clear, 0, 0, 1, 1);
+-	
++
+ 	clear.alpha = MAX(0, MIN(strtol(config_get(config, "highlight", "opacity", "255"), 0, 10) * 256, 65535));
+ 	mw->highlightPixmap = XCreatePixmap(mw->dpy, mw->window, 1, 1, 8);
+ 	mw->highlightPicture = XRenderCreatePicture(mw->dpy, mw->highlightPixmap, XRenderFindStandardFormat(mw->dpy, PictStandardA8), CPRepeat, &pa);
+ 	XRenderFillRectangle(mw->dpy, PictOpSrc, mw->highlightPicture, &clear, 0, 0, 1, 1);
+-	
++
+ 	tmp = config_get(config, "general", "distance", "50");
+ 	mw->distance = MAX(1, strtol(tmp, 0, 10));
+-	
++
+ 	if(! strcasecmp(config_get(config, "tooltip", "show", "true"), "true"))
+ 		mw->tooltip = tooltip_create(mw, config);
+-	
++
+ 	return mw;
+ }
+ 
+@@ -248,16 +254,16 @@
+ 	Pixmap root = wm_get_root_pmap(mw->dpy);
+ 	XRenderColor black = { 0, 0, 0, 65535};
+ 	XRenderPictureAttributes pa;
+-	
++
+ 	if(mw->bg_pixmap)
+ 		XFreePixmap(mw->dpy, mw->bg_pixmap);
+ 	if(mw->background)
+ 		XRenderFreePicture(mw->dpy, mw->background);
+-	
++
+ 	mw->bg_pixmap = XCreatePixmap(mw->dpy, mw->window, mw->width, mw->height, mw->depth);
+ 	pa.repeat = True;
+ 	mw->background = XRenderCreatePicture(mw->dpy, mw->bg_pixmap, mw->format, CPRepeat, &pa);
+-	
++
+ 	if(root == None)
+ 		XRenderFillRectangle(mw->dpy, PictOpSrc, mw->background, &black, 0, 0, mw->width, mw->height);
+ 	else
+@@ -266,7 +272,7 @@
+ 		XRenderComposite(mw->dpy, PictOpSrc, from, None, mw->background, mw->x, mw->y, 0, 0, 0, 0, mw->width, mw->height);
+ 		XRenderFreePicture(mw->dpy, from);
+ 	}
+-	
++
+ 	XSetWindowBackgroundPixmap(mw->dpy, mw->window, mw->bg_pixmap);
+ 	XClearWindow(mw->dpy, mw->window);
+ }
+@@ -280,20 +286,20 @@
+ 	Window dummy_w;
+ 	int root_x, root_y, dummy_i;
+ 	unsigned int dummy_u;
+-	
++
+ 	if(! mw->xin_info || ! mw->xin_screens)
+ 	{
+ 		mainwin_update_background(mw);
+ 		return;
+ 	}
+-	
++
+ # ifdef DEBUG
+ 	fprintf(stderr, "--> querying pointer... ");
+ # endif /* DEBUG */
+ 	XQueryPointer(mw->dpy, mw->root, &dummy_w, &dummy_w, &root_x, &root_y, &dummy_i, &dummy_i, &dummy_u);
+-# ifdef DEBUG	
++# ifdef DEBUG
+ 	fprintf(stderr, "+%i+%i\n", root_x, root_y);
+-	
++
+ 	fprintf(stderr, "--> figuring out which screen we're on... ");
+ # endif /* DEBUG */
+ 	iter = mw->xin_info;
+@@ -311,7 +317,7 @@
+ 	}
+ 	if(i == mw->xin_screens)
+ 	{
+-# ifdef DEBUG 
++# ifdef DEBUG
+ 		fprintf(stderr, "unknown\n");
+ # endif /* DEBUG */
+ 		return;
+@@ -353,32 +359,32 @@
+ {
+ 	if(mw->tooltip)
+ 		tooltip_destroy(mw->tooltip);
+-	
++
+ 	if(mw->background != None)
+ 		XRenderFreePicture(mw->dpy, mw->background);
+-	
++
+ 	if(mw->bg_pixmap != None)
+ 		XFreePixmap(mw->dpy, mw->bg_pixmap);
+-	
++
+ 	if(mw->normalPicture != None)
+ 		XRenderFreePicture(mw->dpy, mw->normalPicture);
+-	
++
+ 	if(mw->highlightPicture != None)
+ 		XRenderFreePicture(mw->dpy, mw->highlightPicture);
+-	
++
+ 	if(mw->normalPixmap != None)
+ 		XFreePixmap(mw->dpy, mw->normalPixmap);
+-	
++
+ 	if(mw->highlightPixmap != None)
+ 		XFreePixmap(mw->dpy, mw->highlightPixmap);
+-	
++
+ 	XDestroyWindow(mw->dpy, mw->window);
+-	
++
+ #ifdef XINERAMA
+ 	if(mw->xin_info)
+ 		XFree(mw->xin_info);
+ #endif /* XINERAMA */
+-	
++
+ 	free(mw);
+ }
+ 
+diff -u old/mainwin.h new/mainwin.h
+--- old/mainwin.h	2004-05-19 23:00:31.000000000 +0200
++++ new/mainwin.h	2011-11-03 18:23:19.324432271 +0100
+@@ -51,7 +51,7 @@
+ 	dlist *cod;
+ 	struct _Tooltip *tooltip;
+ 	
+-	KeyCode key_act, key_up, key_down, key_left, key_right, key_enter, key_space, key_q, key_escape;
++	KeyCode key_act, key_up, key_up_alt, key_down, key_down_alt, key_left, key_left_alt, key_right, key_right_alt, key_enter, key_space, key_q, key_escape;
+ 	
+ #ifdef XINERAMA
+ 	int xin_screens;
+Only in new: skippy-xd
