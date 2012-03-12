@@ -43,4 +43,4 @@ package() {
     ln -s ../../cpt-city "$pkgdir"/usr/share/gmt/cpt/GMT_cpt-city
 }
 
-md5sums=('9bfe176b14fefe6a4ea1466a575c93be')
+md5sums=('6d4871c263f908a5fa5b1e168e1fbe65')
