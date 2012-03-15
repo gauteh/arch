@@ -1,0 +1,53 @@
+# Contributor: Gaute Hope <eg@gaute.vetsj.com>
+
+# This package installs the source aswell as SUP/ archives
+
+pkgname=seisan
+pkgver=9.0.1
+pkgrel=1
+pkgdesc="SEISAN Earthquake analysis software package"
+arch=('i386 x86_64')
+url="http://www.uib.no/rg/geodyn/artikler/2010/02/software"
+license=('custom')
+depends=('gcc-fortran')
+source=('2012-03-14-fix-compile-error-otherway-around.patch' "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${pkgver}/seisan_v${pkgver}_linux_64bit.tar.gz")
+
+build() {
+  cd ${srcdir}
+  patch -p1 < 2012-03-14-fix-compile-error-otherway-around.patch
+
+  # Rebuilding..
+  export SEISARCH=gfortran
+  export OUTPATH=${pkgdir}
+
+  cd LIB/
+  rm -rf libmseed
+  make clean
+  tar zxf ../SUP/libmseed-*.tar.gz
+
+  cd ../PRO
+  make clean
+  make all
+
+  cd ../LIB
+  rm *.o
+  cd libmseed
+  rm *.o
+
+  cd ../../
+}
+
+package () {
+  mkdir -p ${pkgdir}/opt/seisan
+  cp -r ${srcdir}/{CAL,COM,DAT,INC,INF,ISO,LIB,PIC,PRO,REA,SUP,TMP,WAV,WOR} ${pkgdir}/opt/seisan
+
+  # Add seisan dirs to PATH
+  mkdir -p ${pkgdir}/etc/profile.d
+  echo 'export PATH=$PATH:/opt/seisan/PRO' > ${pkgdir}/etc/profile.d/seisan.sh
+  chmod +x ${pkgdir}/etc/profile.d/seisan.sh
+}
+
+
+md5sums=('980b8043673eb893a05e327ce99cf063'
+         '77bd256da404a078c9bd25e686c9792a')
+

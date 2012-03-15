@@ -1,0 +1,76 @@
+diff --git a/LIB/seed.for b/LIB/seed.for
+index 72d0f2a..a746db1 100644
+--- a/LIB/seed.for
++++ b/LIB/seed.for
+@@ -2502,7 +2502,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+   
+           implicit none
+           integer*4 DAY,MON,YR,MTH(12),J
+-          logical*1 isleap
++          logical isleap
+ 
+           integer*2 year
+ 
+@@ -2673,7 +2673,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          integer*2 factor, multiplier ! sample rate components
+          integer*4 last         ! last sample of decompressed sample
+ 
+-         logical*1 calc_rate  ! auxiliary function
++         logical calc_rate  ! auxiliary function
+          integer*2 get_doy
+          logical computer_word_order  ! function
+ 
+@@ -2962,7 +2962,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          integer*4 next_diff    ! next difference
+          integer*4 output(*)    ! place where to put next output
+ 
+-         logical*1 is_1byte, is_2byte ! auxiliary functions
++         logical is_1byte, is_2byte ! auxiliary functions
+ 
+          n = n+1
+          diff(1) = next_diff
+@@ -3035,7 +3035,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          integer*4 next_diff    ! next difference to queue
+          integer*4 output(*)
+ 
+-         logical*1 is_1byte, is_2byte ! auxliary functions
++         logical is_1byte, is_2byte ! auxliary functions
+ 
+          n = n + 1
+          diff(2) = next_diff
+@@ -3066,7 +3066,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          integer*4 next_diff    ! next difference to queue
+          integer*4 output(*)    ! place to put next output
+ 
+-         logical*1 is_2byte     ! auxiliary function
++         logical is_2byte     ! auxiliary function
+ 
+ c         WRITE(*,*) 'debug state 20'
+          diff(2) = next_diff
+@@ -3093,7 +3093,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          integer*4 next_diff    ! next difference to queue
+          integer*4 output(*)    ! place to put next output
+ 
+-         logical*1 is_1byte     ! auxiliary function
++         logical is_1byte     ! auxiliary function
+ 
+          diff(3) = next_diff
+          n = n + 1
+@@ -3118,7 +3118,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          integer*4 next_diff    ! next difference to queue
+          integer*4 output(*)    ! place to put next output
+ 
+-         logical*1 is_1byte     ! auxiliary function
++         logical is_1byte     ! auxiliary function
+ 
+          diff(4) = next_diff
+          n = n + 1
+@@ -3227,7 +3227,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ 
+          integer*2 samples      ! number of samples
+          integer*4 time_to_add  ! time to add in fractions of seconds
+-         logical*1 isleap       ! auxliliary function
++         logical isleap       ! auxliliary function
+ c change jh ock 2005, change samples +1 to samples in next line
+          time_to_add = ((samples) * 10000) / mseed_sample_rate
+ c         WRITE (*,*) 'debug ',time_to_add
