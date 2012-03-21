@@ -34,7 +34,15 @@ build() {
   cd libmseed
   rm *.o
 
-  cd ../../
+  # Regenerate IASP91 model
+  echo "Regenerate IASP91 model.."
+  cd ../../WOR/
+  ../PRO/remodl > /dev/null 2>&1
+  ../PRO/setbrn > /dev/null 2>&1
+  mv IASP* ../DAT/
+  rm *
+
+  cd ../
 }
 
 package () {
