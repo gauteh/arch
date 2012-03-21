@@ -10,7 +10,7 @@ arch=('i386 x86_64')
 url="http://www.uib.no/rg/geodyn/artikler/2010/02/software"
 license=('custom')
 depends=('gcc-fortran')
-source=('2012-03-14-fix-compile-error-otherway-around.patch' "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${pkgver}/seisan_v${pkgver}_linux_64bit.tar.gz")
+source=('2012-03-14-fix-compile-error-otherway-around.patch' "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${pkgver}/seisan_v${pkgver}_linux_64bit.tar.gz" "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${pkgver}/seisan_training_data.tar.gz")
 
 build() {
   cd ${srcdir}
@@ -57,5 +57,5 @@ package () {
 
 
 md5sums=('980b8043673eb893a05e327ce99cf063'
-         '77bd256da404a078c9bd25e686c9792a')
-
+         '77bd256da404a078c9bd25e686c9792a'
+         'e4f81a1d85d8259c80cb8a0bd839168a')
