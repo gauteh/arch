@@ -35,7 +35,8 @@ build() {
   rm *.o
 
   # Regenerate IASP91 model
-  echo "Regenerate IASP91 model.."
+  echo "-----------------------------------------"
+  echo "==> Regenerating IASP91 model.."
   cd ../../WOR/
   ../PRO/remodl > /dev/null 2>&1
   ../PRO/setbrn > /dev/null 2>&1
@@ -44,6 +45,9 @@ build() {
   rm setbrn*
 
   cd ../
+
+  # Avoid stripping of probably useless file..
+  chmod -w SUP/dismg.a
 }
 
 package () {
