@@ -40,7 +40,8 @@ build() {
   ../PRO/remodl > /dev/null 2>&1
   ../PRO/setbrn > /dev/null 2>&1
   mv IASP* ../DAT/
-  rm *
+  rm remodl*
+  rm setbrn*
 
   cd ../
 }
