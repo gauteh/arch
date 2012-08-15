@@ -19,12 +19,12 @@ build() {
   make shared || die "Could not build"
 
   mkdir -p ${pkgdir}/usr/lib
-  mkdir -p ${pkgdir}/usr/include
+  mkdir -p ${pkgdir}/usr/include/libmseed
   mkdir -p ${pkgdir}/usr/share/doc/libmseed
   mkdir -p ${pkgdir}/usr/share/man/man3
 
   cp libmseed.so* ${pkgdir}/usr/lib/
-  cp libmseed.h   ${pkgdir}/usr/include/
+  cp *.h   ${pkgdir}/usr/include/libmseed/
   cp -r example README* doc/libmseed-UsersGuide ${pkgdir}/usr/share/doc/libmseed/
   cp -r doc/*.3   ${pkgdir}/usr/share/man/man3/
 
