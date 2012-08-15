@@ -1,0 +1,39 @@
+# Contributor: Gaute Hope <eg@gaute.vetsj.com>
+#
+# libmseed as extracted from SEISAN
+#
+
+pkgname=libmseed
+pkgver=2.5.1
+pkgrel=1
+pkgdesc="Library for miniSEED"
+arch=('i386 x86_64')
+url=""
+license=('LGPL')
+depends=('gcc')
+source=("${pkgname}-${pkgver}.tar.gz")
+
+build() {
+  cd ${srcdir}/libmseed
+
+  make shared || die "Could not build"
+
+  mkdir -p ${pkgdir}/usr/lib
+  mkdir -p ${pkgdir}/usr/include
+  mkdir -p ${pkgdir}/usr/share/doc/libmseed
+  mkdir -p ${pkgdir}/usr/share/man/man3
+
+  cp libmseed.so* ${pkgdir}/usr/lib/
+  cp libmseed.h   ${pkgdir}/usr/include/
+  cp -r example README* doc/libmseed-UsersGuide ${pkgdir}/usr/share/doc/libmseed/
+  cp -r doc/*.3   ${pkgdir}/usr/share/man/man3/
+
+  echo "=> Documentation has been installed to: /usr/share/doc/libmseed as well to the man database"
+}
+
+post_install() {
+  # Update mandb
+  mandb
+}
+
+md5sums=('408e7bb62a3d01086c1d2b1ac2d3e9b4')
