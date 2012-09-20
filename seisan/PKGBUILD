@@ -3,56 +3,60 @@
 # This package installs the source aswell as SUP/ archives
 
 pkgname=seisan
-pkgver=9.0.1
+pkgver=9.1
+prevfull=9.0.1
 pkgrel=1
 pkgdesc="SEISAN Earthquake analysis software package"
 arch=('i386 x86_64')
 url="http://www.uib.no/rg/geodyn/artikler/2010/02/software"
 license=('custom')
 depends=('gcc-fortran')
-source=('2012-03-14-fix-compile-error-otherway-around.patch' "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${pkgver}/seisan_v${pkgver}_linux_64bit.tar.gz" "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${pkgver}/seisan_training_data.tar.gz")
+source=("seisan${pkgver/./}.tar.gz"
+        "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${prevfull}/seisan_training_data.tar.gz"
+        "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${prevfull}/seisan_v${prevfull}_linux_64bit.tar.gz"
+        )
+noextract=("seisan_v${prevfull}_linux_64bit.tar.gz")
 
 build() {
   cd ${srcdir}
-  patch -p1 < 2012-03-14-fix-compile-error-otherway-around.patch
+
+  mkdir prevfull/
+  tar -C prevfull -zxf "seisan_v${prevfull}_linux_64bit.tar.gz"
 
   # Rebuilding..
-  export SEISARCH=gfortran
+  export SEISARCH=linux64
   export OUTPATH=${pkgdir}
 
   cd LIB/
   rm -rf libmseed
   make clean
-  tar zxf ../SUP/libmseed-*.tar.gz
+  tar zxf ../prevfull/SUP/libmseed-*.tar.gz
 
   cd ../PRO
   make clean
   make all
 
-  cd ../LIB
-  rm *.o
-  cd libmseed
-  rm *.o
-
   # Regenerate IASP91 model
   echo "-----------------------------------------"
   echo "==> Regenerating IASP91 model.."
-  cd ../../WOR/
-  ../PRO/remodl > /dev/null 2>&1
-  ../PRO/setbrn > /dev/null 2>&1
+  cd ../WOR/
+  ../PRO/${SEISARCH}/remodl > /dev/null 2>&1
+  ../PRO/${SEISARCH}/setbrn > /dev/null 2>&1
   mv IASP* ../DAT/
   rm remodl*
   rm setbrn*
 
   cd ../
-
-  # Avoid stripping of probably useless file..
-  chmod -w SUP/dismg.a
 }
 
 package () {
   mkdir -p ${pkgdir}/opt/seisan
-  cp -r ${srcdir}/{CAL,COM,DAT,INC,INF,ISO,LIB,PIC,PRO,REA,SUP,TMP,WAV,WOR} ${pkgdir}/opt/seisan
+  mkdir ${pkgdir}/opt/seisan/{LIB,PRO}
+
+  cp -r "${srcdir}/PRO/${SEISARCH}"/* ${pkgdir}/opt/seisan/PRO/
+  cp -r "${srcdir}/LIB/${SEISARCH}"/* ${pkgdir}/opt/seisan/LIB/
+
+  cp -r ${srcdir}/{CAL,COM,DAT,INC,INF,ISO,PIC,REA,SUP,TMP,WAV,WOR} ${pkgdir}/opt/seisan
 
   # Add seisan dirs to PATH
   mkdir -p ${pkgdir}/etc/profile.d
@@ -60,7 +64,6 @@ package () {
   chmod +x ${pkgdir}/etc/profile.d/seisan.sh
 }
 
-
-md5sums=('980b8043673eb893a05e327ce99cf063'
-         '77bd256da404a078c9bd25e686c9792a'
-         'e4f81a1d85d8259c80cb8a0bd839168a')
+md5sums=('2db3d2faef01a9f3238fa6060fe25d5d'
+         'e4f81a1d85d8259c80cb8a0bd839168a'
+         '77bd256da404a078c9bd25e686c9792a')
