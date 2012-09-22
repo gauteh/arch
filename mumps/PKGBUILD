@@ -5,7 +5,7 @@ pkgrel=1
 pkgdesc="MUMPS solves a sparse system of linear equations A x = b using Gaussian elimination"
 url="http://mumps.enseeiht.fr"
 license="custom"
-depends=('lapack' 'mpich2' 'parmetis-mpich2' 'scotch_esmumps>5.1.7' 'ptscotch>5.1.7' 'blacs-mpi' 'scalapack')
+depends=('lapack' 'mpich2' 'parmetis-mpich2' 'scotch_esmumps>5.1.7' 'ptscotch>5.1.7' 'blacs-mpi' 'scalapack' 'metis')
 makedepends=('make' 'gcc' 'binutils' 'sed' 'coreutils')
 provides=()
 conflicts=()
