@@ -40,6 +40,7 @@ build() {
   do
 	mv -f ${_FILE} ${_FILE}.${pkgver} || return 1
 	ln -s ${_FILE}.${pkgver} ${_FILE}.${pkgver:0:1} || return 1
+	ln -s ${_FILE}.${pkgver} ${_FILE} || return 1
   done
 
   cd "${srcdir}/scotch_${pkgver}_esmumps" || return 1
