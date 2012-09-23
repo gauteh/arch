@@ -49,4 +49,4 @@ build() {
   cp "${srcdir}/scotch_${pkgver}_esmumps/doc/CeCILL-C_V1-en.txt" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" || return 1
 }
 md5sums=('e13b49be804755470b159d7052764dc0'
-         '84473ce8098406e4873d0602fed618dc')
+         'cebb8939b07c7ad470639daf5421ed28')
