@@ -2,7 +2,7 @@
 
 pkgname=libmseed
 pkgver=2.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Library for miniSEED"
 arch=('i386 x86_64')
 url=""
@@ -13,6 +13,8 @@ source=("${pkgname}-${pkgver}.tar.gz")
 build() {
   cd ${srcdir}/libmseed
 
+  make static || die "Could not build"
+  make clean  || die "Could not build"
   make shared || die "Could not build"
 
   mkdir -p ${pkgdir}/usr/lib
@@ -21,6 +23,7 @@ build() {
   mkdir -p ${pkgdir}/usr/share/man/man3
 
   cp libmseed.so* ${pkgdir}/usr/lib/
+  cp libmseed.a*  ${pkgdir}/usr/lib/
   cp *.h   ${pkgdir}/usr/include/libmseed/
   cp -r example README* doc/libmseed-UsersGuide ${pkgdir}/usr/share/doc/libmseed/
   cp -r doc/*.3   ${pkgdir}/usr/share/man/man3/
