@@ -1,10 +1,7 @@
 # Contributor: Gaute Hope <eg@gaute.vetsj.com>
-#
-# libmseed as extracted from SEISAN
-#
 
 pkgname=libmseed
-pkgver=2.5.1
+pkgver=2.7
 pkgrel=1
 pkgdesc="Library for miniSEED"
 arch=('i386 x86_64')
@@ -36,4 +33,4 @@ post_install() {
   mandb
 }
 
-md5sums=('408e7bb62a3d01086c1d2b1ac2d3e9b4')
+md5sums=('ed2369cfdff754f842fe0e752d64308f')
