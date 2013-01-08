@@ -1,0 +1,51 @@
+# Maintainer: Gaute Hope / eg@gaute.vetsj.com
+pkgname=quakeexplorer
+pkgver=40
+pkgrel=1
+epoch=
+pkgdesc="Explore seismological events"
+arch=(any)
+url="http://alomax.free.fr/QuakeExplorer/"
+license=('GPL')
+groups=()
+depends=()
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("http://alomax.free.fr/QuakeExplorer/beta/QuakeExplorer$pkgver.jar")
+noextract=("QuakeExplorer$pkgver.jar")
+
+build() {
+  cd $srcdir
+
+  # gen wrapper file
+  cat > quakeexplorer << EOF
+
+  #! /bin/bash
+
+  java -jar /usr/lib/quakeexplorer/QuakeExplorer.jar
+
+EOF
+
+}
+
+package() {
+  mkdir -p "$pkgdir/usr/lib/quakeexplorer/"
+  cp "$srcdir/QuakeExplorer40.jar" "$pkgdir/usr/lib/quakeexplorer/QuakeExplorer.jar"
+
+  mkdir -p "$pkgdir/usr/bin/"
+  cp "$srcdir/quakeexplorer" "$pkgdir/usr/bin/"
+
+
+  chmod +x "$pkgdir/usr/bin/quakeexplorer"
+}
+
+md5sums=('ab54a7cf7766b1e52f3df1dd961d64bf')
+# vim:set ts=2 sw=2 et:
