@@ -1,0 +1,51 @@
+# Maintainer: Gaute Hope / eg@gaute.vetsj.com
+pkgname=seisgram2k
+pkgver=60
+pkgrel=1
+epoch=
+pkgdesc="View and analyze seismological events"
+arch=(any)
+url="http://alomax.free.fr/seisgram/"
+license=('GPL')
+groups=()
+depends=()
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("http://alomax.free.fr/seisgram/beta/SeisGram2K$pkgver.jar")
+noextract=("SeisGram2K$pkgver.jar")
+
+build() {
+  cd $srcdir
+
+  # gen wrapper file
+  cat > seisgram2k << EOF
+
+  #! /bin/bash
+
+  java -jar /usr/lib/seisgram2k/SeisGram2K.jar
+
+EOF
+
+}
+
+package() {
+  mkdir -p "$pkgdir/usr/lib/seisgram2k/"
+  cp "$srcdir/SeisGram2K$pkgver.jar" "$pkgdir/usr/lib/seisgram2k/SeisGram2K.jar"
+
+  mkdir -p "$pkgdir/usr/bin/"
+  cp "$srcdir/seisgram2k" "$pkgdir/usr/bin/"
+
+
+  chmod +x "$pkgdir/usr/bin/seisgram2k"
+}
+
+# vim:set ts=2 sw=2 et:
+md5sums=('7b686ac131af0426b309fc0cdd086fa8')

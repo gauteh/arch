@@ -38,7 +38,7 @@ EOF
 
 package() {
   mkdir -p "$pkgdir/usr/lib/quakeexplorer/"
-  cp "$srcdir/QuakeExplorer40.jar" "$pkgdir/usr/lib/quakeexplorer/QuakeExplorer.jar"
+  cp "$srcdir/QuakeExplorer$pkgver.jar" "$pkgdir/usr/lib/quakeexplorer/QuakeExplorer.jar"
 
   mkdir -p "$pkgdir/usr/bin/"
   cp "$srcdir/quakeexplorer" "$pkgdir/usr/bin/"
