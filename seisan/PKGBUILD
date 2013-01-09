@@ -1,38 +1,31 @@
-# Contributor: Gaute Hope <eg@gaute.vetsj.com>
-
-# This package installs the source aswell as SUP/ archives
+# Maintainer: Gaute Hope <eg@gaute.vetsj.com>
 
 pkgname=seisan
-pkgver=9.1
-prevfull=9.0.1
+pkgver=9.1.1_pre
 pkgrel=1
 pkgdesc="SEISAN Earthquake analysis software package"
-arch=('i386 x86_64')
+arch=('x86_64')
 url="http://www.uib.no/rg/geodyn/artikler/2010/02/software"
 license=('custom')
-depends=('gcc-fortran')
-source=("seisan${pkgver/./}.tar.gz"
-        "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${prevfull}/seisan_training_data.tar.gz"
-        "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN_${prevfull}/seisan_v${prevfull}_linux_64bit.tar.gz"
+makedepends=('gcc-fortran')
+source=("ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN/SEISAN_9.1.1/seisan_v9.1.1_linux_source_pre.tar.gz"
+        "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN/seisan_test_data.tar.gz"
         )
-noextract=("seisan_v${prevfull}_linux_64bit.tar.gz")
+
+noextract=("seisan_test_data.tar.gz")
 
 build() {
   cd ${srcdir}
-
-  mkdir prevfull/
-  tar -C prevfull -zxf "seisan_v${prevfull}_linux_64bit.tar.gz"
 
   # Rebuilding..
   export SEISARCH=linux64
   export OUTPATH=${pkgdir}
 
   cd LIB/
-  rm -rf libmseed
   make clean
-  tar zxf ../prevfull/SUP/libmseed-*.tar.gz
 
-  cd ../PRO
+  cd ../PRO/
+
   make clean
   make all
 
@@ -47,6 +40,11 @@ build() {
   rm setbrn*
 
   cd ../
+
+  # Increase MULPLT default resolution (screen & hard copy)
+  echo "==> Increasing MULPLT default resolution to 60000.0 points (screen and h/c).."
+  sed -i -e 's|points pl. screen  1500.0|points pl. screen 60000.0|' DAT/MULPLT.DEF
+  sed -i -e 's|points pl. hc      3000.0|points pl. hc     60000.0|' DAT/MULPLT.DEF
 }
 
 package () {
@@ -56,7 +54,14 @@ package () {
   cp -r "${srcdir}/PRO/${SEISARCH}"/* ${pkgdir}/opt/seisan/PRO/
   cp -r "${srcdir}/LIB/${SEISARCH}"/* ${pkgdir}/opt/seisan/LIB/
 
+  # copy pre-compiled msrepack and friends
+  cp "${srcdir}/PRO/"{gmtxy,msrepack,rdseed,seisan2mseed} "${pkgdir}/opt/seisan/PRO/"
+
   cp -r ${srcdir}/{CAL,COM,DAT,INC,INF,ISO,PIC,REA,SUP,TMP,WAV,WOR} ${pkgdir}/opt/seisan
+
+  # Install training data
+  cp "${srcdir}/seisan_test_data.tar.gz" "${pkgdir}/opt/seisan/INF/"
+  echo "==> Test data is located in /opt/seisan/INF."
 
   # Add seisan dirs to PATH
   mkdir -p ${pkgdir}/etc/profile.d
@@ -64,6 +69,6 @@ package () {
   chmod +x ${pkgdir}/etc/profile.d/seisan.sh
 }
 
-md5sums=('2db3d2faef01a9f3238fa6060fe25d5d'
-         'e4f81a1d85d8259c80cb8a0bd839168a'
-         '77bd256da404a078c9bd25e686c9792a')
+md5sums=('1b4b2eeac6b0704cf50cbe8570624764'
+         '17a83cb87732ced23f066712773be29d')
+
