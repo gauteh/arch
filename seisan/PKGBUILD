@@ -2,12 +2,12 @@
 
 pkgname=seisan
 pkgver=9.1.1_pre
-pkgrel=1
+pkgrel=2
 pkgdesc="SEISAN Earthquake analysis software package"
 arch=('x86_64')
 url="http://www.uib.no/rg/geodyn/artikler/2010/02/software"
 license=('custom')
-makedepends=('gcc-fortran')
+makedepends=('gcc-fortran' 'gcc')
 source=("ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN/SEISAN_9.1.1/seisan_v9.1.1_linux_source_pre.tar.gz"
         "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN/seisan_test_data.tar.gz"
         )
@@ -17,7 +17,7 @@ noextract=("seisan_test_data.tar.gz")
 build() {
   cd ${srcdir}
 
-  # Rebuilding..
+  # Rebuilding.. (for x86_64, might work for i386 as well)
   export SEISARCH=linux64
   export OUTPATH=${pkgdir}
 
@@ -42,9 +42,19 @@ build() {
   cd ../
 
   # Increase MULPLT default resolution (screen & hard copy)
-  echo "==> Increasing MULPLT default resolution to 60000.0 points (screen and h/c).."
-  sed -i -e 's|points pl. screen  1500.0|points pl. screen 60000.0|' DAT/MULPLT.DEF
-  sed -i -e 's|points pl. hc      3000.0|points pl. hc     60000.0|' DAT/MULPLT.DEF
+  echo "==> Increasing MULPLT default resolution to 60000 points (screen and h/c).."
+  sed -i -e 's|points pl. screen  1500.0|points pl. screen  60000|' DAT/MULPLT.DEF
+  sed -i -e 's|points pl. hc      3000.0|points pl. hc      60000|' DAT/MULPLT.DEF
+
+  # Update seisan home path
+  echo "==> Update SEISAN home path to /opt/seisan.."
+  sed -i -e 's|/home/seisan|/opt/seisan|' COM/SEISAN.bash
+  sed -i -e 's|/home/s2000/seismo|/opt/seisan|' COM/SEISAN.csh
+
+  # Change default filters in MULPLT
+  #echo "==> Warning: Changing default filters in MULPLT.."
+  #sed -i -e 's|FILTER 1(.*)|FILTER 1                                8.0       25.0 |' DAT/MULPLT.DEF
+  #sed -i -e 's|FILTER 2(.*)|FILTER 2                                20.0      50.0 |' DAT/MULPLT.DEF
 }
 
 package () {
