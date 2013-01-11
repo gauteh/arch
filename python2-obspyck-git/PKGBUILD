@@ -5,21 +5,16 @@ pkgdesc="ObsPyck is a GUI application that is intended to cover the tasks in a s
 arch=('i686' 'x86_64')
 url="http://github.com/megies/obspyck/wiki"
 license=('GPL2')
-groups=()
 depends=('python2' 'python2-numpy' 'obspy' 'python2-matplotlib' 'python2-lxml' 'python2-pyqt' 'python2-pyproj')
 makedepends=('git' 'python2-distribute')
 provides=('obspyck')
-replaces=()
-backup=()
-options=()
-install=
-source=()
-noextract=()
-md5sums=()
-sha256sums=()
+source=('obspyck.sh')
 
 _gitroot=git://github.com/megies/obspyck.git
 _gitname=obspyck
+
+
+PYVERSION=2.7
 
 build() {
   cd "$srcdir"
@@ -39,16 +34,22 @@ build() {
   git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
   cd "$srcdir/$_gitname-build"
 
-  python2 setup.py build --verbose || return 1
+  cp ../obspyck.sh obspyck
+  chmod +x obspyck
 
-  find . -name "*.py" -print | xargs sed -i 's@^#!\s*/usr/bin/env\s\s*python$@#!/usr/bin/env python2@'
-  find . -name "*.py" -print | xargs sed -i 's@^#!\s*/usr/bin/python$@#!/usr/bin/env python2@'
+  sed -i obspyck -e "s|@PYTHONVERSION@|${PYVERSION}|"
+
 }
 
 package() {
   cd "$srcdir/$_gitname-build"
 
-  python2 setup.py install --verbose --root="$pkgdir" || return 1
+  mkdir -p "$pkgdir/usr/lib/python${PYVERSION}/site-packages/obspyck"
+  mkdir -p "$pkgdir/usr/bin"
+
+  cp *.py *.gif *.ui LICENSE* TODO "$pkgdir/usr/lib/python${PYVERSION}/site-packages/obspyck/"
+  cp obspyck "$pkgdir/usr/bin/"
+
 }
 
-# vim:set ts=2 sw=2 et:
+md5sums=('1d4fa9d5c85e02c7776f70ec351d2d62')
