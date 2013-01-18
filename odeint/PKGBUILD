@@ -1,0 +1,55 @@
+pkgname=odeint
+pkgver=20130118
+pkgrel=1
+pkgdesc="A C++ library for Boost for solving Ordinary Differential Equations"
+arch=('any')
+url="http://headmyshoulder.github.com/odeint-v2/"
+license=('GPL3')
+groups=()
+depends=('boost' 'boost-libs')
+makedepends=('git' 'gcc')
+provides=('odeint')
+replaces=()
+backup=()
+options=()
+install=
+source=()
+noextract=()
+md5sums=()
+sha256sums=()
+
+_gitroot=git://github.com/headmyshoulder/odeint-v2.git
+_gitname=odeint
+
+build() {
+  cd "$srcdir"
+  msg "Connecting to GIT server...."
+
+  if [[ -d "$_gitname" ]]; then
+    cd "$_gitname" && git pull origin
+    msg "The local files are updated."
+  else
+    git clone "$_gitroot" "$_gitname"
+  fi
+
+  msg "GIT checkout done or server timeout"
+  msg "Starting build..."
+
+  rm -rf "$srcdir/$_gitname-build"
+  git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+  cd "$srcdir/$_gitname-build"
+
+  # todo: build docs
+
+}
+
+package() {
+  cd "$srcdir/$_gitname-build"
+
+  mkdir -p "$pkgdir/usr/include"
+  cp -r boost "$pkgdir/usr/include/"
+
+  # todo: install docs
+}
+
+# vim:set ts=2 sw=2 et:
