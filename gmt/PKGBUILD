@@ -36,6 +36,4 @@ build() {
 
 md5sums=('9f241e97774eadd1fe79f4d7022fcaed'
          'dfdf81474451084e7cb73dd459a7f19a'
-         '2edad2c64b492187976c41e1c0eeeb10')
-
-# vim:set ts=2 sw=2 et:
+         '4924da25f3ed82c65141c045c2306d44')

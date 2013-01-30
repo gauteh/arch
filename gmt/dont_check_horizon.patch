@@ -1,12 +1,13 @@
 diff -ru a/src/gmt_map.c b/src/gmt_map.c
 --- a/src/gmt_map.c	2012-12-18 21:45:55.000000000 +0100
-+++ b/src/gmt_map.c	2013-01-30 13:47:25.006450905 +0100
-@@ -589,7 +589,7 @@
++++ b/src/gmt_map.c	2013-01-30 13:59:52.166421222 +0100
+@@ -589,7 +589,9 @@
  		GMT_dlat = (project_info.n - project_info.s) / GMT_n_lat_nodes;
  	}
  
--	if (GMT_IS_AZIMUTHAL && !project_info.region) GMT_horizon_search (west, east, south, north, project_info.xmin, project_info.xmax, project_info.ymin, project_info.ymax);
-+	if (search && GMT_IS_AZIMUTHAL && !project_info.region) GMT_horizon_search (west, east, south, north, project_info.xmin, project_info.xmax, project_info.ymin, project_info.ymax);
++  /*
+ 	if (GMT_IS_AZIMUTHAL && !project_info.region) GMT_horizon_search (west, east, south, north, project_info.xmin, project_info.xmax, project_info.ymin, project_info.ymax);
++  */
  
  	if (project_info.central_meridian < project_info.w && (project_info.central_meridian + 360.0) <= project_info.e) project_info.central_meridian += 360.0;
  	if (project_info.central_meridian > project_info.e && (project_info.central_meridian - 360.0) >= project_info.w) project_info.central_meridian -= 360.0;
