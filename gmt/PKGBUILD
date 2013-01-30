@@ -1,0 +1,41 @@
+# Contributor: Benjamin Sick
+
+pkgname=gmt
+pkgver=4.5.9
+pkgrel=1
+pkgdesc="Generic Mapping Tools: Collection of tools for manipulating geographic and Cartesian data sets, and generating EPS maps."
+arch=(i686 x86_64)
+url="http://gmt.soest.hawaii.edu/"
+license=('GPL')
+depends=('libxaw' 'gdal' 'octave')
+optdepends=('csh: for some of example scripts')
+install=gmt.install
+source=(ftp://ftp.soest.hawaii.edu/gmt/${pkgname}-${pkgver}.tar.bz2 gmtdigitize.patch dont_check_horizon.patch)
+
+build() {
+  cd ${startdir}/src/GMT${pkgver}
+  ./configure --prefix=/usr --enable-triangle --enable-octave \
+              --enable-eps --enable-gdal \
+              --mandir=$startdir/pkg/usr/share/man \
+              --enable-netcdf=/usr \
+              --datarootdir=$startdir/pkg/usr/share/gmt
+  export MAKEFLAGS="-j1"
+  patch -p0 -i ${startdir}/src/gmtdigitize.patch
+  patch -p1 -i ${startdir}/src/dont_check_horizon.patch
+  make || return 1
+  make MEX_XDIR=$pkgdir/`octave-config --oct-site-dir` \
+       MEX_MDIR=$pkgdir/`octave-config --m-site-dir` \
+       prefix=$startdir/pkg/usr install-all || return 1
+  sed -i $pkgdir/usr/bin/GMT -e "s%$startdir/pkg%%"
+  mkdir -p $startdir/pkg/etc/profile.d
+  echo "# GMT environment variable" > $startdir/pkg/etc/profile.d/gmt.sh
+  echo "export GMTHOME=/usr/share/gmt" >> $startdir/pkg/etc/profile.d/gmt.sh
+  echo 'export GMT_SHAREDIR=${GMTHOME}' >> $startdir/pkg/etc/profile.d/gmt.sh
+  chmod 755 $startdir/pkg/etc/profile.d/gmt.sh
+}
+
+md5sums=('9f241e97774eadd1fe79f4d7022fcaed'
+         'dfdf81474451084e7cb73dd459a7f19a'
+         '2edad2c64b492187976c41e1c0eeeb10')
+
+# vim:set ts=2 sw=2 et:
