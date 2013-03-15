@@ -1,0 +1,53 @@
+# Maintainer: Gaute Hope <eg@gaute.vetsj.com>
+pkgname=taup
+pkgver=2.1.1
+pkgrel=1
+epoch=
+pkgdesc=""
+arch=('x86_64')
+url="http://www.seis.sc.edu/TauP/"
+license=('GPL')
+groups=()
+depends=()
+makedepends=('gradle')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=(http://www.seis.sc.edu/downloads/TauP/TauP-$pkgver.tgz)
+
+build() {
+  cd "$srcdir/TauP-$pkgver"
+
+  # re-compile
+  # TODO: this installs deps for the local user..
+  gradle
+
+  # bat cleaning 
+  cd bin
+  rm *.bat
+
+  cd ..
+}
+
+package() {
+  cd "$srcdir/TauP-$pkgver"
+
+  mkdir -p $pkgdir/usr/share/TauP
+  cp -r * $pkgdir/usr/share/TauP
+
+  # Set up environment
+  mkdir -p ${pkgdir}/etc/profile.d
+  echo "export TAUP_HOME=/usr/share/TauP"     > $pkgdir/etc/profile.d/taup.sh
+  echo "export PATH=\$PATH:/\${TAUP_HOME}/bin" >> $pkgdir/etc/profile.d/taup.sh
+
+  chmod +x ${pkgdir}/etc/profile.d/taup.sh
+}
+
+md5sums=('134733fc740ddc2ae13196751200f619')
+# vim:set ts=2 sw=2 et:
