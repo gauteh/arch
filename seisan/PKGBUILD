@@ -2,7 +2,7 @@
 
 pkgname=seisan
 pkgver=9.1.1_pre
-pkgrel=2
+pkgrel=3
 pkgdesc="SEISAN Earthquake analysis software package"
 arch=('x86_64')
 url="http://www.uib.no/rg/geodyn/artikler/2010/02/software"
