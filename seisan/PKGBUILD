@@ -75,7 +75,7 @@ package () {
 
   # Add seisan dirs to PATH
   mkdir -p ${pkgdir}/etc/profile.d
-  echo 'export PATH=\$PATH:/opt/seisan/PRO' > ${pkgdir}/etc/profile.d/seisan.sh
+  echo "export PATH=\$PATH:/opt/seisan/PRO" > ${pkgdir}/etc/profile.d/seisan.sh
   chmod +x ${pkgdir}/etc/profile.d/seisan.sh
 }
 
