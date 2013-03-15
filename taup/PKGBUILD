@@ -44,7 +44,7 @@ package() {
   # Set up environment
   mkdir -p ${pkgdir}/etc/profile.d
   echo "export TAUP_HOME=/usr/share/TauP"     > $pkgdir/etc/profile.d/taup.sh
-  echo "export PATH=\$PATH:/\${TAUP_HOME}/bin" >> $pkgdir/etc/profile.d/taup.sh
+  echo "export PATH=\$PATH:\${TAUP_HOME}/bin" >> $pkgdir/etc/profile.d/taup.sh
 
   chmod +x ${pkgdir}/etc/profile.d/taup.sh
 }
