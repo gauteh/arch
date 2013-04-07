@@ -1,9 +1,9 @@
 # Author: Gaute Hope <eg@gaute.vetsj.com>
 pkgname=gtkhotkey
 pkgver=0.2.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Platform independent hotkey handling for Gtk+ applications"
-arch=('i686')
+arch=('any')
 url="https://launchpad.net/gtkhotkey"
 license=('LGPL3')
 depends=('glib2' 'gtk2')
@@ -16,5 +16,9 @@ build() {
   ./configure --prefix=/usr || return 1
   make || return 1
   make DESTDIR="${pkgdir}" install || return 1
+}
+
+package() {
+  :
 }
 
