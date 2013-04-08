@@ -1,0 +1,44 @@
+# $Id: PKGBUILD 86457 2013-03-17 14:17:48Z bpiotrowski $
+# Maintainer: Jaroslav Lichtblau <dragonlord@aur.archlinux.org>
+# Contributor: Alexander Fehr <pizzapunk gmail com>
+
+pkgname=catfish
+pkgver=0.6.1
+pkgrel=3
+pkgdesc="A versatile file searching tool"
+arch=('any')
+url='https://launchpad.net/catfish-search'
+license=('GPL')
+install=$pkgname.install 
+depends=('gtk3' 'python-gobject' 'pyxdg' 'xdg-utils' 'hicolor-icon-theme')
+makedepends=('intltool')
+optdepends=('zeitgeist: Zeitgeist integration'
+            'findutils: filename search'
+            'locate:    filename search'
+            'tracker:   fulltext search'
+            'strigi:    fulltext search'
+            'pinot:     fulltext search')
+source=(https://launchpad.net/$pkgname-search/0.6/$pkgver/+download/$pkgname-$pkgver.tar.bz2 'check_if_dir_exists.patch')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+
+  patch -p0 < $srcdir/check_if_dir_exists.patch
+
+  ./configure --prefix=/usr
+
+  # Correct symlinks
+  sed -i 's|ln -sf $(DESTDIR)/$(PREFIX)/share|ln -sf ..|' Makefile
+  make
+}
+
+package () {
+  cd $srcdir/$pkgname-$pkgver
+  make DESTDIR=$pkgdir install
+
+  install -d $pkgdir/usr/share/pixmaps
+  ln -s /usr/share/icons/hicolor/scalable/apps/$pkgname.svg $pkgdir/usr/share/pixmaps/$pkgname.svg
+}
+
+md5sums=('63044c2dca7df438d9ed67f8e4e9b652'
+         '530e10d41d575cc5c72c002712b4154b')
