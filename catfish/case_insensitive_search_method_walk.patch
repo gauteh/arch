@@ -1,0 +1,13 @@
+=== modified file 'catfish/CatfishSearchEngine.py'
+--- catfish/CatfishSearchEngine.py	2013-03-01 21:46:49 +0000
++++ catfish/CatfishSearchEngine.py	2013-04-08 13:40:47 +0000
+@@ -218,7 +218,7 @@
+                 if any(keyword in folder for keyword in keywords):
+                     yield os.path.join(root, folder)
+             for filename in files:
+-                if any(keyword in filename for keyword in keywords):
++                if any(keyword.lower() in filename.lower() for keyword in keywords):
+                     yield os.path.join(root, filename)
+             yield True
+         yield False
+

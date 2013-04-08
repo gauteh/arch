@@ -18,12 +18,13 @@ optdepends=('zeitgeist: Zeitgeist integration'
             'tracker:   fulltext search'
             'strigi:    fulltext search'
             'pinot:     fulltext search')
-source=(https://launchpad.net/$pkgname-search/0.6/$pkgver/+download/$pkgname-$pkgver.tar.bz2 'check_if_dir_exists.patch')
+            source=(https://launchpad.net/$pkgname-search/0.6/$pkgver/+download/$pkgname-$pkgver.tar.bz2 'check_if_dir_exists.patch' 'case_insensitive_search_method_walk.patch')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
 
   patch -p0 < $srcdir/check_if_dir_exists.patch
+  patch -p0 < $srcdir/case_insensitive_search_method_walk.patch
 
   ./configure --prefix=/usr
 
@@ -41,4 +42,5 @@ package () {
 }
 
 md5sums=('63044c2dca7df438d9ed67f8e4e9b652'
-         '530e10d41d575cc5c72c002712b4154b')
+         '530e10d41d575cc5c72c002712b4154b'
+         'c9961e8b213adb0cb7a9b21585eddd15')
