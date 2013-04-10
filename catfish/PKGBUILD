@@ -3,8 +3,8 @@
 # Contributor: Alexander Fehr <pizzapunk gmail com>
 
 pkgname=catfish
-pkgver=0.6.1
-pkgrel=3
+pkgver=0.6.3
+pkgrel=1
 pkgdesc="A versatile file searching tool"
 arch=('any')
 url='https://launchpad.net/catfish-search'
@@ -18,13 +18,11 @@ optdepends=('zeitgeist: Zeitgeist integration'
             'tracker:   fulltext search'
             'strigi:    fulltext search'
             'pinot:     fulltext search')
-            source=(https://launchpad.net/$pkgname-search/0.6/$pkgver/+download/$pkgname-$pkgver.tar.bz2 'check_if_dir_exists.patch' 'case_insensitive_search_method_walk.patch')
+
+source=(https://launchpad.net/$pkgname-search/0.6/$pkgver/+download/$pkgname-$pkgver.tar.bz2)
 
 build() {
   cd $srcdir/$pkgname-$pkgver
-
-  patch -p0 < $srcdir/check_if_dir_exists.patch
-  patch -p0 < $srcdir/case_insensitive_search_method_walk.patch
 
   ./configure --prefix=/usr
 
@@ -41,6 +39,5 @@ package () {
   ln -s /usr/share/icons/hicolor/scalable/apps/$pkgname.svg $pkgdir/usr/share/pixmaps/$pkgname.svg
 }
 
-md5sums=('63044c2dca7df438d9ed67f8e4e9b652'
-         '530e10d41d575cc5c72c002712b4154b'
-         'c9961e8b213adb0cb7a9b21585eddd15')
+md5sums=('4fd496c55d9dce64f555074c478cc4dd')
+
