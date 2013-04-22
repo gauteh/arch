@@ -48,8 +48,12 @@ build() {
 
   # Update seisan home path
   echo "==> Update SEISAN home path to /opt/seisan.."
-  sed -i -e 's|/home/seisan|/opt/seisan|' COM/SEISAN.bash
+  sed -i -e 's|/home/seismo|/opt/seisan|' COM/SEISAN.bash
   sed -i -e 's|/home/s2000/seismo|/opt/seisan|' COM/SEISAN.csh
+
+  echo "==> Use vim as default editor.."
+  sed -i -e 's|"vi"|"vim"|' COM/SEISAN.bash
+  sed -i -e 's|EDITOR vi|EDITOR vim|' COM/SEISAN.csh
 
   # Change default filters in MULPLT
   #echo "==> Warning: Changing default filters in MULPLT.."
@@ -76,6 +80,7 @@ package () {
   # Add seisan dirs to PATH
   mkdir -p ${pkgdir}/etc/profile.d
   echo "export PATH=\$PATH:/opt/seisan/PRO" > ${pkgdir}/etc/profile.d/seisan.sh
+  echo "source /opt/seisan/COM/SEISAN.bash" >> ${pkgdir}/etc/profile.d/seisan.sh
   chmod +x ${pkgdir}/etc/profile.d/seisan.sh
 }
 
