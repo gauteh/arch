@@ -1,0 +1,13 @@
+diff -ru NumixWhiteTheme/NumixWhite3.8/gtk-3.0/gtk.css b/NumixWhite3.8/gtk-3.0/gtk.css
+--- NumixWhiteTheme/NumixWhite3.8/gtk-3.0/gtk.css	2013-04-27 11:47:22.000000000 +0200
++++ b/NumixWhite3.8/gtk-3.0/gtk.css	2013-10-23 16:04:03.306497114 +0200
+@@ -1,7 +1,7 @@
+ /* Default color scheme */
+-@define-color bg_color #ffffff; /*Possibly slightly grayer?*/
++@define-color bg_color #f2f2f2; /*Possibly slightly grayer?*/
+ @define-color fg_color #555555;
+-@define-color base_color #ffffff; /*Same as bg color for consistency in asthetics*/
++@define-color base_color #f2f2f2; /*Same as bg color for consistency in asthetics*/
+ @define-color text_color #333333;
+ @define-color selected_bg_color #d64937;
+ @define-color selected_fg_color #ffffff;

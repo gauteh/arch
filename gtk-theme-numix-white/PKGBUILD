@@ -9,11 +9,16 @@ arch=('any')
 url="http://thevirtualdragon.deviantart.com/art/Numix-White-Gtk-Theme-v1-4-367777347"
 license=('GPL3')
 depends=('gtk-engine-murrine')
-source=(http://fc07.deviantart.net/fs71/f/2013/132/8/3/numix_white__gtk_theme_v1_4_by_thevirtualdragon-d62yqtf.zip)
-md5sums=('08ac10bf9ca082ac70d1d7e296ee6b35')
+source=(http://fc07.deviantart.net/fs71/f/2013/132/8/3/numix_white__gtk_theme_v1_4_by_thevirtualdragon-d62yqtf.zip fix-bg-color.patch)
+
+build() {
+  cd $srcdir/NumixWhiteTheme
+
+  patch -p1 < ../fix-bg-color.patch
+
+}
 
 package() {
-
   # remove unneeded files
   rm -f .gitignore LICENSE README
 
@@ -24,4 +29,7 @@ package() {
 
 
 
+
+md5sums=('08ac10bf9ca082ac70d1d7e296ee6b35'
+         '11ec59526210a51a52ec45948286f4a1')
 
