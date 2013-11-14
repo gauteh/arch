@@ -1,0 +1,36 @@
+# Maintainer: Nicolas Avrutin  <nicolasavru@gmail.com>
+pkgname=pa-applet-git
+pkgver=15.005f192
+pkgrel=1
+pkgdesc="PulseAudio system tray applet with volume bar"
+arch=(i686 x86_64)
+url="https://github.com/fernandotcl/pa-applet"
+license=('BSD')
+depends=('gtk3' 'libnotify' 'libpulse')
+makedepends=('git')
+options=('!libtool')
+
+source=("$pkgname"::'git://github.com/fernandotcl/pa-applet.git'
+        '0001-remove-calls-to-deprecated-function-gdk_display_get_.patch')
+md5sums=('SKIP')
+
+pkgver() {
+    cd "$pkgname"
+    echo $(git rev-list --count HEAD).$(git rev-parse --short HEAD)
+}
+
+build() {
+    cd "$srcdir/$pkgname"
+    patch -p1 < ../0001-remove-calls-to-deprecated-function-gdk_display_get_.patch
+    ./autogen.sh
+    ./configure --prefix=/usr
+    make
+}
+
+package() {
+    cd "$srcdir/$pkgname"
+    make DESTDIR="$pkgdir/" install
+    install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+md5sums=('SKIP'
+         '245d43f001605ff1ced10a563df9273b')

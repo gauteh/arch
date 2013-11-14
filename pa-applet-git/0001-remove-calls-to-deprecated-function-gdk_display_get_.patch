@@ -1,0 +1,158 @@
+From bdae08d098d188fe383e10a4ca1a3f45473d59e4 Mon Sep 17 00:00:00 2001
+From: Nicolas Avrutin <nicolasavru@gmail.com>
+Date: Thu, 10 Oct 2013 21:34:05 -0400
+Subject: [PATCH] remove calls to deprecated function gdk_display_get_n_screens
+
+---
+ src/key_grabber.c | 122 ++++++++++++++++++++++++++----------------------------
+ 1 file changed, 59 insertions(+), 63 deletions(-)
+
+diff --git a/src/key_grabber.c b/src/key_grabber.c
+index 9c67772..4a566c1 100644
+--- a/src/key_grabber.c
++++ b/src/key_grabber.c
+@@ -77,42 +77,40 @@ void key_grabber_grab_keys(void)
+         }
+     }
+ 
+-    // Grab the keys for all screens
+-    for (int i = 0; i < gdk_display_get_n_screens(gdkDisplay); ++i) {
+-        GdkScreen *screen = gdk_display_get_screen(gdkDisplay, i);
+-        if (screen == NULL)
+-            continue;
++    // Grab the keys for screen
++    GdkScreen *screen = gdk_display_get_default_screen(gdkDisplay);
++    if (screen == NULL)
++        return;
+ 
+-        // Find the X11 root window
+-        GdkWindow *gdkRoot = gdk_screen_get_root_window(screen);
+-        Window root = GDK_WINDOW_XID(gdkRoot);
+-
+-        for (int i = 0; i < NUM_KEYS_TO_GRAB; ++i) {
+-            // Ignore the keys that we couldn't resolve
+-            KeyCode keycode = grabbed_keys[i];
+-            if (keycode == 0)
+-                continue;
+-
+-            // Try to grab the keycodes with any modifiers
+-            gdk_error_trap_push();
+-            XGrabKey(dpy, keycode, 0, root, True, GrabModeAsync, GrabModeAsync);
+-            XGrabKey(dpy, keycode, Mod2Mask, root, True, GrabModeAsync, GrabModeAsync);
+-            XGrabKey(dpy, keycode, Mod5Mask, root, True, GrabModeAsync, GrabModeAsync);
+-            XGrabKey(dpy, keycode, LockMask, root, True, GrabModeAsync, GrabModeAsync);
+-            XGrabKey(dpy, keycode, Mod2Mask | Mod5Mask, root, True, GrabModeAsync, GrabModeAsync);
+-            XGrabKey(dpy, keycode, Mod2Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
+-            XGrabKey(dpy, keycode, Mod5Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
+-            XGrabKey(dpy, keycode, Mod2Mask | Mod5Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
+-            gdk_flush();
+-
+-            // Handle errors
+-            if (gdk_error_trap_pop())
+-                g_printerr("Failed to grab %s\n", keysym_names[i]);
+-        }
++    // Find the X11 root window
++    GdkWindow *gdkRoot = gdk_screen_get_root_window(screen);
++    Window root = GDK_WINDOW_XID(gdkRoot);
++
++    for (int i = 0; i < NUM_KEYS_TO_GRAB; ++i) {
++        // Ignore the keys that we couldn't resolve
++        KeyCode keycode = grabbed_keys[i];
++        if (keycode == 0)
++            continue;
+ 
+-        // Register for X events
+-        gdk_window_add_filter(gdkRoot, filter_func, NULL);
++        // Try to grab the keycodes with any modifiers
++        gdk_error_trap_push();
++        XGrabKey(dpy, keycode, 0, root, True, GrabModeAsync, GrabModeAsync);
++        XGrabKey(dpy, keycode, Mod2Mask, root, True, GrabModeAsync, GrabModeAsync);
++        XGrabKey(dpy, keycode, Mod5Mask, root, True, GrabModeAsync, GrabModeAsync);
++        XGrabKey(dpy, keycode, LockMask, root, True, GrabModeAsync, GrabModeAsync);
++        XGrabKey(dpy, keycode, Mod2Mask | Mod5Mask, root, True, GrabModeAsync, GrabModeAsync);
++        XGrabKey(dpy, keycode, Mod2Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
++        XGrabKey(dpy, keycode, Mod5Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
++        XGrabKey(dpy, keycode, Mod2Mask | Mod5Mask | LockMask, root, True, GrabModeAsync, GrabModeAsync);
++        gdk_flush();
++
++        // Handle errors
++        if (gdk_error_trap_pop())
++            g_printerr("Failed to grab %s\n", keysym_names[i]);
+     }
++
++    // Register for X events
++    gdk_window_add_filter(gdkRoot, filter_func, NULL);
+ }
+ 
+ void key_grabber_ungrab_keys(void)
+@@ -121,39 +119,37 @@ void key_grabber_ungrab_keys(void)
+     GdkDisplay *gdkDisplay = gdk_display_get_default();
+     Display *dpy = GDK_DISPLAY_XDISPLAY(gdkDisplay);
+ 
+-    // Ungrab the keys for all screens
+-    for (int i = 0; i < gdk_display_get_n_screens(gdkDisplay); ++i) {
+-        GdkScreen *screen = gdk_display_get_screen(gdkDisplay, i);
+-        if (screen == NULL)
+-            continue;
++    // Ungrab the keys for screen
++    GdkScreen *screen = gdk_display_get_default_screen(gdkDisplay);
++    if (screen == NULL)
++        return;
+ 
+-        // Find the X11 root window
+-        GdkWindow *gdkRoot = gdk_screen_get_root_window(screen);
+-        Window root = GDK_WINDOW_XID(gdkRoot);
+-
+-        for (int i = 0; i < NUM_KEYS_TO_GRAB; ++i) {
+-            // Ignore the keys that we couldn't resolve
+-            KeyCode keycode = grabbed_keys[i];
+-            if (keycode == 0)
+-                continue;
+-
+-            // Ungrab everything
+-            gdk_error_trap_push();
+-            XUngrabKey(dpy, keycode, Mod2Mask, root);
+-            XUngrabKey(dpy, keycode, Mod5Mask, root);
+-            XUngrabKey(dpy, keycode, LockMask, root);
+-            XUngrabKey(dpy, keycode, Mod2Mask | Mod5Mask, root);
+-            XUngrabKey(dpy, keycode, Mod2Mask | LockMask, root);
+-            XUngrabKey(dpy, keycode, Mod5Mask | LockMask, root);
+-            XUngrabKey(dpy, keycode, Mod2Mask | Mod5Mask | LockMask, root);
+-            gdk_flush();
+-            if (gdk_error_trap_pop())
+-                g_printerr("Failed to ungrab %s\n", keysym_names[i]);
+-        }
++    // Find the X11 root window
++    GdkWindow *gdkRoot = gdk_screen_get_root_window(screen);
++    Window root = GDK_WINDOW_XID(gdkRoot);
++
++    for (int i = 0; i < NUM_KEYS_TO_GRAB; ++i) {
++        // Ignore the keys that we couldn't resolve
++        KeyCode keycode = grabbed_keys[i];
++        if (keycode == 0)
++            continue;
+ 
+-        // Unregister for X events
+-        gdk_window_remove_filter(gdkRoot, filter_func, NULL);
++        // Ungrab everything
++        gdk_error_trap_push();
++        XUngrabKey(dpy, keycode, Mod2Mask, root);
++        XUngrabKey(dpy, keycode, Mod5Mask, root);
++        XUngrabKey(dpy, keycode, LockMask, root);
++        XUngrabKey(dpy, keycode, Mod2Mask | Mod5Mask, root);
++        XUngrabKey(dpy, keycode, Mod2Mask | LockMask, root);
++        XUngrabKey(dpy, keycode, Mod5Mask | LockMask, root);
++        XUngrabKey(dpy, keycode, Mod2Mask | Mod5Mask | LockMask, root);
++        gdk_flush();
++        if (gdk_error_trap_pop())
++            g_printerr("Failed to ungrab %s\n", keysym_names[i]);
+     }
++
++    // Unregister for X events
++    gdk_window_remove_filter(gdkRoot, filter_func, NULL);
+ }
+ 
+ void key_grabber_register_volume_raise_callback(key_grabber_cb cb)
+-- 
+1.8.4.2
+
