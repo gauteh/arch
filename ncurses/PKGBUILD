@@ -1,0 +1,68 @@
+# $Id: PKGBUILD 197156 2013-10-23 13:04:21Z allan $
+# Maintainer: Allan McRae <allan@archlinux.org>
+# Contributor: judd <jvinet@zeroflux.org>
+
+pkgname=ncurses
+pkgver=5.9
+pkgrel=6
+pkgdesc="System V Release 4.0 curses emulation library"
+arch=('i686' 'x86_64')
+url="http://www.gnu.org/software/ncurses/"
+license=('MIT')
+depends=('glibc')
+source=("$pkgname-$pkgver.zip::https://github.com/gauteh/ncurses/archive/form_driver_w.zip")
+
+build() {
+  cd ${srcdir}/
+
+  mv ncurses-form_driver_w ncurses-$pkgver
+
+  mkdir ncurses{,w}-build
+
+  cd ${srcdir}/ncursesw-build
+  ../${pkgname}-${pkgver}/configure --prefix=/usr --mandir=/usr/share/man \
+     --with-shared --with-normal --without-debug --without-ada \
+     --enable-widec --enable-pc-files
+  # add --enable-ext-colors and --enable-ext-mouse with next soname bump
+  make
+
+  # libraries for external binary support
+  cd ${srcdir}/ncurses-build
+  [ $CARCH = "x86_64" ] && CONFIGFLAG="--with-chtype=long"
+  ../${pkgname}-${pkgver}/configure --prefix=/usr \
+    --with-shared --with-normal --without-debug --without-ada $CONFIGFLAG
+  make
+}
+
+package() {
+  cd ${srcdir}/ncursesw-build
+  make DESTDIR=${pkgdir} install
+
+  # fool packages looking to link to non-wide-character ncurses libraries
+  for lib in ncurses form panel menu; do
+    echo "INPUT(-l${lib}w)" >${pkgdir}/usr/lib/lib${lib}.so
+  done
+
+  for lib in ncurses ncurses++ form panel menu; do
+    ln -s ${lib}w.pc ${pkgdir}/usr/lib/pkgconfig/${lib}.pc
+  done
+
+  # some packages look for -lcurses during build
+  echo "INPUT(-lncursesw)" >${pkgdir}/usr/lib/libcursesw.so
+  ln -s libncurses.so ${pkgdir}/usr/lib/libcurses.so
+
+  # non-widec compatibility libraries
+  cd ${srcdir}/ncurses-build
+  for lib in ncurses form panel menu; do
+    install -Dm755 lib/lib${lib}.so.${pkgver} ${pkgdir}/usr/lib/lib${lib}.so.${pkgver}
+    ln -s lib${lib}.so.${pkgver} ${pkgdir}/usr/lib/lib${lib}.so.5
+  done
+
+  # install license, rip it from the readme
+  cd ${srcdir}/${pkgname}-${pkgver}
+  install -dm755 ${pkgdir}/usr/share/licenses/$pkgname
+  grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
+}
+
+md5sums=('397c0418165af9aa8b5a61507a8c7428')
+
