@@ -64,5 +64,4 @@ package() {
   grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
 }
 
-md5sums=('397c0418165af9aa8b5a61507a8c7428')
-
+md5sums=('dbcb9c7712e120fe572736d8644aa6b7')
