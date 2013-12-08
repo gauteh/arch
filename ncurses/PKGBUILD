@@ -10,12 +10,12 @@ arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/ncurses/"
 license=('MIT')
 depends=('glibc')
-source=("$pkgname-$pkgver.zip::https://github.com/gauteh/ncurses/archive/form_driver_w.zip")
+source=("$pkgname-$pkgver.zip::https://github.com/gauteh/ncurses/archive/master.zip")
 
 build() {
   cd ${srcdir}/
 
-  mv ncurses-form_driver_w ncurses-$pkgver
+  mv ncurses-master ncurses-$pkgver
 
   mkdir ncurses{,w}-build
 
@@ -64,4 +64,4 @@ package() {
   grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
 }
 
-md5sums=('dbcb9c7712e120fe572736d8644aa6b7')
+md5sums=('fc567ac9ee78dac3b32c963801309958')
