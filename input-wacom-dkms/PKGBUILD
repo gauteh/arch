@@ -1,0 +1,47 @@
+# Maintainer: Giuseppe Sellaroli <g.sellaroli  at  yahoo  dot  it>
+pkgname=input-wacom-dkms
+_pkgname=input-wacom
+pkgver=git
+pkgrel=1
+pkgdesc="Latest Kernel modules form Wacom tablets (DKMS)"
+arch=('i686' 'x86_64')
+url="http://sourceforge.net/apps/mediawiki/linuxwacom/index.php?title=Input-wacom"
+license=('GPL2')
+depends=('dkms')
+optdepends=('xf86-input-wacom: for actually using a Wacom tablet')
+install=$pkgname.install
+source=("linuxwacom-input-wacom-955bc05d68ec670ff647533230bbfff5a54a6670.zip"
+	"dkms.conf"
+  "gzipall")
+noextract=()
+
+package() {
+
+  cd $srcdir
+  mv linuxwacom-input-wacom-955bc05d68ec670ff647533230bbfff5a54a6670 input-wacom-git
+
+	installdir="$pkgdir/usr/src/$_pkgname-git"
+
+  install -dm755 "$installdir"
+  install -m644 "$srcdir/dkms.conf" "$installdir"
+
+  cd "${srcdir}/${_pkgname}-${pkgver}/"
+
+  cp $srcdir/gzipall .
+
+  ./autogen.sh
+  #./gzipall
+
+  for d in `find . -type d`
+  do
+          install -dm755  "$installdir/$d"
+  done
+
+  for f in `find . -type f`
+  do
+          install -m644 "${srcdir}/${_pkgname}-${pkgver}/$f" "$installdir/$f"
+  done
+
+  chmod +x "$installdir/configure"
+  chmod +x "$installdir/gzipall"
+}

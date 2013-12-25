@@ -1,0 +1,5 @@
+#! /bin/bash
+
+gzip -f 3.7/wacom.ko
+gzip -f 3.7/wacom_w8001.ko
+
