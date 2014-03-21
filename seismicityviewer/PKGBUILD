@@ -1,0 +1,48 @@
+# Maintainer: Gaute Hope <eg@gaute.vetsj.com>
+pkgname=SeismicityViewer
+pkgver=5.0
+pkgrel=1
+epoch=
+pkgdesc=""
+arch=('any')
+url="http://alomax.free.fr/seismicity/"
+license=('GPL')
+groups=()
+depends=('jre7-openjdk')
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=(http://alomax.free.fr/seismicity/SeismicityViewer${pkgver/./}.jar)
+noextract=("SeismicityViewer${pkgver/./}.jar")
+md5sums=('9b4514faa7f9b5398476b33ddb9be101')
+
+
+build() {
+	cd "$srcdir"
+
+  cat > seismicityviewer <<EOF
+#! /bin/bash
+
+java -jar /usr/share/seismicityviewer/SeismicityViewer${pkgver/./}.jar $@
+
+EOF
+  chmod +x seismicityviewer
+
+}
+
+package() {
+	cd "$srcdir"
+
+  mkdir -p "$pkgdir/usr/share/seismicityviewer"
+  cp *.jar "$pkgdir/usr/share/seismicityviewer/"
+
+  mkdir -p "$pkgdir/usr/bin"
+  cp seismicityviewer "$pkgdir/usr/bin"
+}
