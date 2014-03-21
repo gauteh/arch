@@ -41,7 +41,8 @@ build() {
   cd "$srcdir/$_gitname-build"
 
   #export FFLAGS="$FFLAGS -fPIC"     # required by gfortran
-  export LDFLAGS="$LDFLAGS -shared" # required by gfortran
+  #export LDFLAGS="$LDFLAGS -shared" # required by gfortran
+  unset LDFLAGS
 
   python setup.py build --verbose || return 1
 
@@ -53,7 +54,8 @@ package() {
   cd "$srcdir/$_gitname-build"
 
   #export FFLAGS="$FFLAGS -fPIC"     # required by gfortran
-  export LDFLAGS="$LDFLAGS -shared" # required by gfortran
+  #export LDFLAGS="$LDFLAGS -shared" # required by gfortran
+  #unset LDFLAGS
   python setup.py install --verbose --root="$pkgdir" || return 1
 }
 
