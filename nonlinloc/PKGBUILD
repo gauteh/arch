@@ -1,0 +1,39 @@
+# Maintainer: Gaute Hope <eg@gaute.vetsj.com>
+pkgname=nonlinloc
+pkgver=6.00
+pkgrel=1
+epoch=
+pkgdesc="Probabilistic, Non-Linear, Global-Search Earthquake Location in 3D Media"
+arch=('any')
+url=""
+license=('GPL')
+groups=()
+depends=()
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("http://alomax.free.fr/nlloc/soft${pkgver}/tar/NLL${pkgver}_src.tgz")
+noextract=()
+md5sums=('dee886272f8fe9daea0ca91f600258a1')
+
+build() {
+	cd "$srcdir/src"
+	make -R all
+}
+
+
+package() {
+	cd "$srcdir/src"
+
+  mkdir -p "$pkgdir/usr/bin"
+  cp fpfit2hyp Grid2GMT Grid2Time hypoe2hyp LocSum NLLoc oct2grid \
+     PhsAssoc Time2EQ Vel2Grid "$pkgdir/usr/bin/"
+
+}
