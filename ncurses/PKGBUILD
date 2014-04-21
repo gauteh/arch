@@ -1,26 +1,32 @@
 # $Id: PKGBUILD 197156 2013-10-23 13:04:21Z allan $
 # Maintainer: Allan McRae <allan@archlinux.org>
 # Contributor: judd <jvinet@zeroflux.org>
+#
+# Modified by Gaute Hope to use latest patch level of ncurses.
 
-pkgname=ncurses
+pkgname=ncurses-dev
+rpkgname=ncurses
+provides=ncurses
+replaces=ncurses
 pkgver=5.9
-pkgrel=6
+patchlevel=20140419
+pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library"
 arch=('i686' 'x86_64')
 url="http://www.gnu.org/software/ncurses/"
 license=('MIT')
 depends=('glibc')
-source=("$pkgname-$pkgver.zip::https://github.com/gauteh/ncurses/archive/master.zip")
+source=("ftp://invisible-island.net/ncurses/current/ncurses-${pkgver}-${patchlevel}.tgz")
 
 build() {
   cd ${srcdir}/
 
-  mv ncurses-master ncurses-$pkgver
+  mv ncurses-$pkgver-$patchlevel ncurses-$pkgver
 
-  mkdir ncurses{,w}-build
+  mkdir -p ncurses{,w}-build
 
   cd ${srcdir}/ncursesw-build
-  ../${pkgname}-${pkgver}/configure --prefix=/usr --mandir=/usr/share/man \
+  ../${rpkgname}-${pkgver}/configure --prefix=/usr --mandir=/usr/share/man \
      --with-shared --with-normal --without-debug --without-ada \
      --enable-widec --enable-pc-files
   # add --enable-ext-colors and --enable-ext-mouse with next soname bump
@@ -29,7 +35,7 @@ build() {
   # libraries for external binary support
   cd ${srcdir}/ncurses-build
   [ $CARCH = "x86_64" ] && CONFIGFLAG="--with-chtype=long"
-  ../${pkgname}-${pkgver}/configure --prefix=/usr \
+  ../${rpkgname}-${pkgver}/configure --prefix=/usr \
     --with-shared --with-normal --without-debug --without-ada $CONFIGFLAG
   make
 }
@@ -59,9 +65,9 @@ package() {
   done
 
   # install license, rip it from the readme
-  cd ${srcdir}/${pkgname}-${pkgver}
-  install -dm755 ${pkgdir}/usr/share/licenses/$pkgname
-  grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
+  cd ${srcdir}/${rpkgname}-${pkgver}
+  install -dm755 ${pkgdir}/usr/share/licenses/$rpkgname
+  grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${rpkgname}/license.txt
 }
 
 md5sums=('fc567ac9ee78dac3b32c963801309958')
