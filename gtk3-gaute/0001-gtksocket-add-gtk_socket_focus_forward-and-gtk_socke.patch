@@ -1,0 +1,80 @@
+From bbef00344e90bf1d99feffc0f885855bf582f436 Mon Sep 17 00:00:00 2001
+From: Gaute Hope <eg@gaute.vetsj.com>
+Date: Thu, 1 May 2014 19:49:02 +0200
+Subject: [PATCH] gtksocket: add gtk_socket_focus_forward and
+ gtk_socket_focus_backward
+
+To be able to set the focus of the embedded childs widgets
+programtically (without using Tab) a signal to focus the next
+widget had to be sent.
+
+This adds two functions:
+
+gboolean gtk_socket_focus_forward (GtkSocket *socket_)
+
+and
+
+gboolean gtk_socket_focus_backward (GtkSocket *socket_)
+
+which can be used to focus the next or previous widget of the child.
+---
+ gtk/gtksocket.c | 26 ++++++++++++++++++++++++++
+ gtk/gtksocket.h |  5 +++++
+ 2 files changed, 31 insertions(+)
+
+diff --git a/gtk/gtksocket.c b/gtk/gtksocket.c
+index b59deb1..492ff9b 100644
+--- a/gtk/gtksocket.c
++++ b/gtk/gtksocket.c
+@@ -935,6 +935,32 @@ gtk_socket_claim_focus (GtkSocket *socket,
+   gtk_widget_set_can_focus (widget, FALSE);
+ }
+ 
++/**
++ * gtk_socket_focus_forward:
++ * @socket: a #GtkSocket
++ *
++ * Move the focus of embedded client to its next
++ * logical widget.
++ */
++gboolean
++gtk_socket_focus_forward (GtkSocket *socket)
++{
++  return gtk_socket_focus (GTK_WIDGET(socket), GTK_DIR_TAB_FORWARD);
++}
++
++/**
++ * gtk_socket_focus_backward:
++ * @socket: a #GtkSocket
++ *
++ * Move the focus of embedded client to its previous
++ * logical widget.
++ */
++gboolean
++gtk_socket_focus_backward (GtkSocket *socket)
++{
++  return gtk_socket_focus (GTK_WIDGET(socket), GTK_DIR_TAB_BACKWARD);
++}
++
+ static gboolean
+ gtk_socket_focus (GtkWidget       *widget,
+ 		  GtkDirectionType direction)
+diff --git a/gtk/gtksocket.h b/gtk/gtksocket.h
+index abd9bad..6a9cfe1 100644
+--- a/gtk/gtksocket.h
++++ b/gtk/gtksocket.h
+@@ -82,6 +82,11 @@ Window     gtk_socket_get_id          (GtkSocket *socket_);
+ GDK_AVAILABLE_IN_ALL
+ GdkWindow *gtk_socket_get_plug_window (GtkSocket *socket_);
+ 
++GDK_AVAILABLE_IN_ALL
++gboolean   gtk_socket_focus_forward   (GtkSocket *socket_);
++GDK_AVAILABLE_IN_ALL
++gboolean   gtk_socket_focus_backward  (GtkSocket *socket_);
++
+ G_END_DECLS
+ 
+ #endif /* GDK_WINDOWING_X11 */
+-- 
+1.9.2
+
