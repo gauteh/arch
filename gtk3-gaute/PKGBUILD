@@ -12,7 +12,7 @@ arch=(i686 x86_64)
 url="http://www.gtk.org/"
 install=gtk3.install
 provides=gtk3
-replaces=gtk3
+conflicts=gtk3
 depends=(atk cairo gtk-update-icon-cache libcups libxcursor libxinerama libxrandr libxi
          libxcomposite libxdamage pango shared-mime-info colord at-spi2-atk wayland libxkbcommon)
 makedepends=(gobject-introspection)
