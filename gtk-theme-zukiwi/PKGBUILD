@@ -1,0 +1,23 @@
+# Maintainer: Drake Arconis <lightdrake at gmail.com>
+# Contributor: Frikilinux <frikilinux at gmail.com>
+# Contributor: bwat47 <bwat47 at gmail dot com>
+
+pkgname=gtk-theme-zukiwi
+pkgver=20131107
+pkgrel=1
+pkgdesc="A gtk2, gtk3, metacity, and unity theme..."
+arch=('any')
+url="http://gnome-look.org/content/show.php/Zukiwi?content=152192"
+license=('GPL3')
+depends=('gtk-engines' 'gtk-engine-murrine')
+conflicts=('zukiwi-theme')
+options=('!strip')
+source=("http://gnome-look.org/CONTENT/content-files/152192-Zukiwi.zip")
+sha256sums=('84fbf80aa5899d2225b1c9e25ba05132a65889cde69ad08710a2a6d6e20e7bd2')
+
+
+package() {
+  # install theme
+  find Zukiwi/ -type f -exec install -Dm644 "{}" "$pkgdir/usr/share/themes/{}" \;
+}
+
