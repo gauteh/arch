@@ -1,14 +1,15 @@
 # Maintainer: Gaute Hope <eg@gaute.vetsj.com>
 
 pkgname=seisan
-pkgver=9.1.1_pre
-pkgrel=3
+pkgver=10.0
+pkgrel=1
 pkgdesc="SEISAN Earthquake analysis software package"
 arch=('x86_64')
-url="http://www.uib.no/rg/geodyn/artikler/2010/02/software"
+url="http://seisan.info/"
 license=('custom')
 makedepends=('gcc-fortran' 'gcc')
-source=("ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN/SEISAN_9.1.1/seisan_v9.1.1_linux_source_pre.tar.gz"
+depends=('libmseed')
+source=("ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN/seisan_v${pkgver}_linux_64bit.tar.gz"
         "ftp://ftp.geo.uib.no/pub/seismo/SOFTWARE/SEISAN/seisan_test_data.tar.gz"
         )
 
@@ -19,12 +20,15 @@ build() {
 
   # Rebuilding.. (for x86_64, might work for i386 as well)
   export SEISARCH=linux64
-  export OUTPATH=${pkgdir}
+  export OUTPATH=${SEISARCH}
 
   cd LIB/
   make clean
 
   cd ../PRO/
+
+  # update install path
+  sed -i -e "s|/uibsan/home/s2000/seismo/pro|${pkgdir}/opt/seisan/PRO|" Makefile
 
   make clean
   make all
@@ -33,8 +37,8 @@ build() {
   echo "-----------------------------------------"
   echo "==> Regenerating IASP91 model.."
   cd ../WOR/
-  ../PRO/${SEISARCH}/remodl > /dev/null 2>&1
-  ../PRO/${SEISARCH}/setbrn > /dev/null 2>&1
+  ../PRO/remodl > /dev/null 2>&1
+  ../PRO/setbrn > /dev/null 2>&1
   mv IASP* ../DAT/
   rm remodl*
   rm setbrn*
@@ -59,17 +63,24 @@ build() {
   #echo "==> Warning: Changing default filters in MULPLT.."
   #sed -i -e 's|FILTER 1(.*)|FILTER 1                                8.0       25.0 |' DAT/MULPLT.DEF
   #sed -i -e 's|FILTER 2(.*)|FILTER 2                                20.0      50.0 |' DAT/MULPLT.DEF
+
 }
 
 package () {
   mkdir -p ${pkgdir}/opt/seisan
   mkdir ${pkgdir}/opt/seisan/{LIB,PRO}
 
-  cp -r "${srcdir}/PRO/${SEISARCH}"/* ${pkgdir}/opt/seisan/PRO/
-  cp -r "${srcdir}/LIB/${SEISARCH}"/* ${pkgdir}/opt/seisan/LIB/
+  export SEISARCH=linux64
+  export OUTPATH=${SEISARCH}
+
+  cd "${srcdir}/PRO"
+  make install
+
+  #cp -r "${srcdir}/PRO/${SEISARCH}"/* ${pkgdir}/opt/seisan/PRO/
+  cp -r "${srcdir}/LIB/"*.a "${pkgdir}/opt/seisan/LIB/"
 
   # copy pre-compiled msrepack and friends
-  cp "${srcdir}/PRO/"{gmtxy,msrepack,rdseed,seisan2mseed} "${pkgdir}/opt/seisan/PRO/"
+  cp "${srcdir}/PRO/gmtxy" "${pkgdir}/opt/seisan/PRO/"
 
   cp -r ${srcdir}/{CAL,COM,DAT,INC,INF,ISO,PIC,REA,SUP,TMP,WAV,WOR} ${pkgdir}/opt/seisan
 
@@ -84,6 +95,5 @@ package () {
   chmod +x ${pkgdir}/etc/profile.d/seisan.sh
 }
 
-md5sums=('1b4b2eeac6b0704cf50cbe8570624764'
+md5sums=('7fd3f858374c39379195252728b28e04'
          '17a83cb87732ced23f066712773be29d')
-
