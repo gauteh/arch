@@ -40,22 +40,21 @@ build() {
   git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
   cd "$srcdir/$_gitname-build"
 
-  #export FFLAGS="$FFLAGS -fPIC"     # required by gfortran
-  #export LDFLAGS="$LDFLAGS -shared" # required by gfortran
+  # it seems that the default LDFLAGS set by pacman / makepkg
+  # causes trouble for python setup.py:
+  #
+  #   https://github.com/obspy/obspy/issues/759
+  #
+
   unset LDFLAGS
 
   python setup.py build --verbose || return 1
-
-  #find . -name "*.py" -print | xargs sed -i 's@^#!\s*/usr/bin/env\s\s*python$@#!/usr/bin/env python2@'
-  #find . -name "*.py" -print | xargs sed -i 's@^#!\s*/usr/bin/python$@#!/usr/bin/env python2@'
 }
 
 package() {
   cd "$srcdir/$_gitname-build"
 
-  #export FFLAGS="$FFLAGS -fPIC"     # required by gfortran
-  #export LDFLAGS="$LDFLAGS -shared" # required by gfortran
-  unset LDFLAGS
+  unset LDFLAGS # see comment in build()
   python setup.py install --verbose --root="$pkgdir" || return 1
 
   # link libs so that python can find them
