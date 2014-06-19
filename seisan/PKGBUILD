@@ -2,7 +2,7 @@
 
 pkgname=seisan
 pkgver=10.1
-pkgrel=1
+pkgrel=2
 pkgdesc="SEISAN Earthquake analysis software package"
 arch=('x86_64')
 url="http://seisan.info/"
@@ -57,6 +57,10 @@ build() {
   msg "Use vim as default editor.."
   sed -i -e 's|"vi"|"vim"|' COM/SEISAN.bash
   sed -i -e 's|EDITOR vi|EDITOR vim|' COM/SEISAN.csh
+
+  msg "Convert windows line endings to unix line endings in SEISAN.*sh .."
+  sed -i 's/\r//g' COM/SEISAN.bash
+  sed -i 's/\r//g' COM/SEISAN.csh
 
   # Change default filters in MULPLT
   #echo "==> Warning: Changing default filters in MULPLT.."
