@@ -2,7 +2,7 @@
 
 pkgname=hyposat
 pkgver=4.4b
-pkgrel=1
+pkgrel=2
 pkgdesc="HYPOSAT earthquake localization package"
 arch=(any)
 url="ftp://ftp.norsar.no/pub/outgoing/johannes/hyposat/"
@@ -10,6 +10,11 @@ source=("ftp://ftp.norsar.no/pub/outgoing/johannes/hyposat/hyposat.${pkgver/./_}
 license=('AS-IS')
 
 build()
+{
+  :
+}
+
+package()
 {
   mkdir -p ${pkgdir}/usr/bin
   mkdir -p ${pkgdir}/usr/share/hyposat
@@ -20,7 +25,11 @@ build()
   cp -r ${srcdir}/man     ${pkgdir}/usr/share/hyposat/
   cp -r ${srcdir}/{README,README_l} ${pkgdir}/usr/share/hyposat/
 
-  echo "Data and examples installed to: /usr/share/hyposat"
+  msg "Data and examples installed to: /usr/share/hyposat"
+
+  mkdir -p ${pkgdir}/etc/profile.d
+  echo "export HYPOSAT_DATA=/usr/share/hyposat/data" > ${pkgdir}/etc/profile.d/hyposat.sh
+  chmod +x ${pkgdir}/etc/profile.d/hyposat.sh
 }
 
 md5sums=('967f27bea23b1b7d8808ef8af5e8e0f7')
