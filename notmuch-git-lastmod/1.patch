@@ -1,0 +1,181 @@
+Delivered-To: eg@gaute.vetsj.com
+Received: by 10.96.174.104 with SMTP id br8csp158571qdc;
+	Sun, 12 Oct 2014 23:21:17 -0700 (PDT)
+X-Received: by 10.42.184.8 with SMTP id ci8mr32954522icb.25.1413181277289;       
+ Sun, 12 Oct 2014 23:21:17 -0700 (PDT)
+Return-Path: <notmuch-bounces@notmuchmail.org>
+Received: from olra.theworths.org (u15218177.onlinehome-server.com. [74.208.220.233])
+	by mx.google.com with ESMTPS id wa16si26709200icb.86.2014.10.12.23.21.17
+	for <eg@gaute.vetsj.com>        (version=TLSv1 cipher=RC4-SHA bits=128/128);        Sun, 12 Oct 2014 23:21:17 -0700 (PDT)
+Received-SPF: none (google.com: notmuch-bounces@notmuchmail.org does not
+ designate permitted sender hosts) client-ip=74.208.220.233;
+Authentication-Results: mx.google.com;       spf=neutral (google.com:
+ notmuch-bounces@notmuchmail.org does not designate permitted sender hosts)
+ smtp.mail=notmuch-bounces@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id CDB28431FC0;
+	Sun, 12 Oct 2014 23:21:16 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id Bg7BQsEuS1A8; Sun, 12 Oct 2014 23:21:16 -0700 (PDT)
+Received: from olra.theworths.org (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 333FA431FDE;
+	Sun, 12 Oct 2014 23:20:44 -0700 (PDT)
+X-Original-To: notmuch@notmuchmail.org
+Delivered-To: notmuch@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 19362431FD8
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:26 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id mq5YbDnu2QYv for <notmuch@notmuchmail.org>;
+	Sun, 12 Oct 2014 23:20:18 -0700 (PDT)
+Received: from dmz-mailsec-scanner-6.mit.edu (dmz-mailsec-scanner-6.mit.edu	[18.7.68.35])	(using TLSv1
+	with cipher DHE-RSA-AES256-SHA (256/256 bits))	(No client certificate requested)
+	by olra.theworths.org (Postfix) with ESMTPS id 7E3C2431FBD
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:14 -0700 (PDT)
+X-AuditID: 12074423-f799d6d00000337c-0b-543b6f1c3870
+Received: from mailhub-auth-4.mit.edu ( [18.7.62.39])	(using TLS
+	with cipher AES256-SHA (256/256 bits))	(Client did not present a certificate)
+	by dmz-mailsec-scanner-6.mit.edu (Symantec Messaging Gateway) with SMTP
+	id BF.74.13180.C1F6B345; Mon, 13 Oct 2014 02:20:12 -0400 (EDT)
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	by mailhub-auth-4.mit.edu (8.13.8/8.9.2) with ESMTP id s9D6K8wt019181;
+	Mon, 13 Oct 2014 02:20:08 -0400
+Received: from drake.dyndns.org ([73.162.189.21]) (authenticated bits=0)	(User authenticated as amdragon@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.13.8/8.12.4) with ESMTP
+	id s9D6K5Ve031972	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=NOT);	Mon, 13 Oct 2014 02:20:07 -0400
+Received: from amthrax by drake.dyndns.org
+	with local (Exim 4.84)	(envelope-from <aclements@csail.mit.edu>)
+	id 1XdYzF-0000U8-8L; Mon, 13 Oct 2014 02:20:05 -0400
+From: Austin Clements <aclements@csail.mit.edu>
+To: notmuch@notmuchmail.org
+Subject: [WIP PATCH 1/4] lib: Only sync modified message documents
+Date: Mon, 13 Oct 2014 02:20:00 -0400
+Message-Id: <1413181203-1676-2-git-send-email-aclements@csail.mit.edu>
+X-Mailer: git-send-email 2.1.0
+In-Reply-To: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+References: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+X-Brightmail-Tracker: 
+ H4sIAAAAAAAAA+NgFtrIIsWRmVeSWpSXmKPExsUixG6nriuTbx1i0Phc3eL6zZnMDowez1bd
+	Yg5gjOKySUnNySxLLdK3S+DKaJ6yjL1gj1jFm5lHmRoYfwp2MXJySAiYSOy7cosNwhaTuHBv
+	PZDNxSEkMJtJ4vfZ21DORkaJtXdgnOVMEt9erWeFcJYwSpxq6GUF6WcT0JdYsXYSmC0iIC2x
+	8+5sIJuDg1lATeJPlwqIKSzgJPFvtQ5IBYuAqkTbrxcsIGFeATeJTb8DIY6Qk9iw+z8jiM0p
+	4C5xceJZZhBbCKjkWNs1lgmM/AsYGVYxyqbkVunmJmbmFKcm6xYnJ+blpRbpmunlZpbopaaU
+	bmIEh4yL8g7GPweVDjEKcDAq8fBa/rEKEWJNLCuuzD3EKMnBpCTKG5BmHSLEl5SfUpmRWJwR
+	X1Sak1p8iFGCg1lJhPetDVCONyWxsiq1KB8mJc3BoiTOu+kHX4iQQHpiSWp2ampBahFMVoaD
+	Q0mCVz0PqFGwKDU9tSItM6cEIc3EwQkynAdoeEsOyPDigsTc4sx0iPwpRkUpcd7vuUAJAZBE
+	RmkeXC8spl8xigO9IswbB7KCB5gO4LpfAQ1mAhp8tMscZHBJIkJKqoHRKvn1kWvVgTzq29VT
+	znlHTdfc9OtsTXB7vKLjogk6urG7nj8zrfAR60+o0FirNtmN0znkvf+dQq9c/a3Pwy+1lCdc
+	3OWcy5R/1NpBofE2j7qBdATLFFblOWvNNqxTdte9wnE9NIL56sStt5eWXrqrWtYmmxy1dUXo
+	zSvcx7paObLk9x5bpqPEUpyRaKjFXFScCAAjIfjwxAIAAA==
+X-BeenThere: notmuch@notmuchmail.org
+X-Mailman-Version: 2.1.13
+Precedence: list
+List-Id: "Use and development of the notmuch mail system."
+	<notmuch.notmuchmail.org>
+List-Unsubscribe: <http://notmuchmail.org/mailman/options/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=unsubscribe>
+List-Archive: <http://notmuchmail.org/pipermail/notmuch>
+List-Post: <mailto:notmuch@notmuchmail.org>
+List-Help: <mailto:notmuch-request@notmuchmail.org?subject=help>
+List-Subscribe: <http://notmuchmail.org/mailman/listinfo/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=subscribe>
+MIME-Version: 1.0
+Sender: notmuch-bounces@notmuchmail.org
+Errors-To: notmuch-bounces@notmuchmail.org
+X-Keywords: dev/notmuch
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+From: Austin Clements <amdragon@mit.edu>
+
+Previously, we updated the database copy of a message on every call to
+_notmuch_message_sync, even if nothing had changed.  In particular,
+this always happens on a thaw, so a freeze/thaw pair with no
+modifications between still caused a database update.
+
+We only modify message documents in a handful of places, so keep track
+of whether the document has been modified and only sync it when
+necessary.  This will be particularly important when we add message
+revision tracking.
+---
+ lib/message.cc | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/lib/message.cc b/lib/message.cc
+index a7a13cc..cf2fd7c 100644
+--- a/lib/message.cc
++++ b/lib/message.cc
+@@ -43,6 +43,9 @@ struct visible _notmuch_message {
+      * if each flag has been initialized. */
+     unsigned long lazy_flags;
+ 
++    /* Message document modified since last sync */
++    notmuch_bool_t modified;
++
+     Xapian::Document doc;
+     Xapian::termcount termpos;
+ };
+@@ -538,6 +541,7 @@ _notmuch_message_remove_terms (notmuch_message_t *message, const char *prefix)
+ 
+ 	try {
+ 	    message->doc.remove_term ((*i));
++	    message->modified = TRUE;
+ 	} catch (const Xapian::InvalidArgumentError) {
+ 	    /* Ignore failure to remove non-existent term. */
+ 	}
+@@ -791,6 +795,7 @@ void
+ _notmuch_message_clear_data (notmuch_message_t *message)
+ {
+     message->doc.set_data ("");
++    message->modified = TRUE;
+ }
+ 
+ static void
+@@ -988,6 +993,7 @@ _notmuch_message_set_header_values (notmuch_message_t *message,
+ 			    Xapian::sortable_serialise (time_value));
+     message->doc.add_value (NOTMUCH_VALUE_FROM, from);
+     message->doc.add_value (NOTMUCH_VALUE_SUBJECT, subject);
++    message->modified = TRUE;
+ }
+ 
+ /* Synchronize changes made to message->doc out into the database. */
+@@ -999,8 +1005,12 @@ _notmuch_message_sync (notmuch_message_t *message)
+     if (message->notmuch->mode == NOTMUCH_DATABASE_MODE_READ_ONLY)
+ 	return;
+ 
++    if (! message->modified)
++	return;
++
+     db = static_cast <Xapian::WritableDatabase *> (message->notmuch->xapian_db);
+     db->replace_document (message->doc_id, message->doc);
++    message->modified = FALSE;
+ }
+ 
+ /* Delete a message document from the database. */
+@@ -1075,6 +1085,7 @@ _notmuch_message_add_term (notmuch_message_t *message,
+ 	return NOTMUCH_PRIVATE_STATUS_TERM_TOO_LONG;
+ 
+     message->doc.add_term (term, 0);
++    message->modified = TRUE;
+ 
+     talloc_free (term);
+ 
+@@ -1143,6 +1154,7 @@ _notmuch_message_remove_term (notmuch_message_t *message,
+ 
+     try {
+ 	message->doc.remove_term (term);
++	message->modified = TRUE;
+     } catch (const Xapian::InvalidArgumentError) {
+ 	/* We'll let the philosopher's try to wrestle with the
+ 	 * question of whether failing to remove that which was not
+-- 
+2.1.0
+
+_______________________________________________
+notmuch mailing list
+notmuch@notmuchmail.org
+http://notmuchmail.org/mailman/listinfo/notmuch

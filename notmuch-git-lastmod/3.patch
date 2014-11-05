@@ -1,0 +1,179 @@
+Delivered-To: eg@gaute.vetsj.com
+Received: by 10.96.174.104 with SMTP id br8csp158539qdc;
+	Sun, 12 Oct 2014 23:20:56 -0700 (PDT)
+X-Received: by 10.50.103.42 with SMTP id ft10mr28110932igb.40.1413181256210;       
+ Sun, 12 Oct 2014 23:20:56 -0700 (PDT)
+Return-Path: <notmuch-bounces@notmuchmail.org>
+Received: from olra.theworths.org (u15218177.onlinehome-server.com. [74.208.220.233])
+	by mx.google.com with ESMTPS id jj9si26771437icb.36.2014.10.12.23.20.56
+	for <eg@gaute.vetsj.com>        (version=TLSv1 cipher=RC4-SHA bits=128/128);        Sun, 12 Oct 2014 23:20:56 -0700 (PDT)
+Received-SPF: none (google.com: notmuch-bounces@notmuchmail.org does not
+ designate permitted sender hosts) client-ip=74.208.220.233;
+Authentication-Results: mx.google.com;       spf=neutral (google.com:
+ notmuch-bounces@notmuchmail.org does not designate permitted sender hosts)
+ smtp.mail=notmuch-bounces@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 9F9E7431FBF;
+	Sun, 12 Oct 2014 23:20:55 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id V7CUAdH01e1E; Sun, 12 Oct 2014 23:20:53 -0700 (PDT)
+Received: from olra.theworths.org (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 8D9BB431FD2;
+	Sun, 12 Oct 2014 23:20:24 -0700 (PDT)
+X-Original-To: notmuch@notmuchmail.org
+Delivered-To: notmuch@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 11A88431FC4
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:23 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id CpgXZeBr3HDH for <notmuch@notmuchmail.org>;
+	Sun, 12 Oct 2014 23:20:17 -0700 (PDT)
+Received: from dmz-mailsec-scanner-8.mit.edu (dmz-mailsec-scanner-8.mit.edu	[18.7.68.37])	(using TLSv1
+	with cipher DHE-RSA-AES256-SHA (256/256 bits))	(No client certificate requested)
+	by olra.theworths.org (Postfix) with ESMTPS id 799C8431FB6
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:13 -0700 (PDT)
+X-AuditID: 12074425-f79e46d000002583-64-543b6f1bf69b
+Received: from mailhub-auth-3.mit.edu ( [18.9.21.43])	(using TLS
+	with cipher AES256-SHA (256/256 bits))	(Client did not present a certificate)
+	by dmz-mailsec-scanner-8.mit.edu (Symantec Messaging Gateway) with SMTP
+	id B0.94.09603.B1F6B345; Mon, 13 Oct 2014 02:20:11 -0400 (EDT)
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	by mailhub-auth-3.mit.edu (8.13.8/8.9.2) with ESMTP id s9D6K8pR021370;
+	Mon, 13 Oct 2014 02:20:08 -0400
+Received: from drake.dyndns.org ([73.162.189.21]) (authenticated bits=0)	(User authenticated as amdragon@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.13.8/8.12.4) with ESMTP
+	id s9D6K58Q031971	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=NOT);	Mon, 13 Oct 2014 02:20:07 -0400
+Received: from amthrax by drake.dyndns.org
+	with local (Exim 4.84)	(envelope-from <aclements@csail.mit.edu>)
+	id 1XdYzF-0000UG-AX; Mon, 13 Oct 2014 02:20:05 -0400
+From: Austin Clements <aclements@csail.mit.edu>
+To: notmuch@notmuchmail.org
+Subject: [WIP PATCH 3/4] lib: API to retrieve database revision and UUID
+Date: Mon, 13 Oct 2014 02:20:02 -0400
+Message-Id: <1413181203-1676-4-git-send-email-aclements@csail.mit.edu>
+X-Mailer: git-send-email 2.1.0
+In-Reply-To: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+References: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+X-Brightmail-Tracker: 
+ H4sIAAAAAAAAA+NgFtrEIsWRmVeSWpSXmKPExsUixCmqrSudbx1i0LxW3OL6zZnMDowez1bd
+	Yg5gjOKySUnNySxLLdK3S+DK2LrhClPBDbGKFe9eMTUwzhLqYuTkkBAwkbj5ejkzhC0mceHe
+	erYuRi4OIYHZTBK/jl9hhHA2Mkp03N7OClIlJLCcSeLU/1KIxBJGiRuvNjKBJNgE9CVWrJ0E
+	ViQiIC2x8+5sIJuDg1lAV6K5XRkkLCzgIfFlZwcLiM0ioCpx8GwDO4jNK+Am0TJ9A9QVchIb
+	dv9nBLE5BdwlLk48ywyx103iWNs1lgmM/AsYGVYxyqbkVunmJmbmFKcm6xYnJ+blpRbpWujl
+	ZpbopaaUbmIEBQ27i+oOxgmHlA4xCnAwKvHwWvyxChFiTSwrrsw9xCjJwaQkyhuQZh0ixJeU
+	n1KZkVicEV9UmpNafIhRgoNZSYT3rQ1QjjclsbIqtSgfJiXNwaIkzrvpB1+IkEB6Yklqdmpq
+	QWoRTFaGg0NJgvdENlCjYFFqempFWmZOCUKaiYMTZDgP0HApkBre4oLE3OLMdIj8KUZFKXHe
+	q1lACQGQREZpHlwvLKpfMYoDvSLMGwjSzgNMCHDdr4AGMwENPtplDjK4JBEhJdXAuNzSssXr
+	yr7yQLf2qf94DQ+8u+OVp/Mquudx78J/7cpbPuvcVbX+WbT8IKtN+azDXzbIrLfnen7WYsOP
+	TZecX/ZHz/WZfHHpZptQhY8SR+Ysjz1yJNv48H0V/RM7NJe+/+sTLfOYYYfuV9mA/UVRf1M5
+	n+9UCrllfdsoiG1yWsv96bG5hxvlHJRYijMSDbWYi4oTAVlYbiLFAgAA
+Cc: Austin Clements <aclements@csail.mit.edu>
+X-BeenThere: notmuch@notmuchmail.org
+X-Mailman-Version: 2.1.13
+Precedence: list
+List-Id: "Use and development of the notmuch mail system."
+	<notmuch.notmuchmail.org>
+List-Unsubscribe: <http://notmuchmail.org/mailman/options/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=unsubscribe>
+List-Archive: <http://notmuchmail.org/pipermail/notmuch>
+List-Post: <mailto:notmuch@notmuchmail.org>
+List-Help: <mailto:notmuch-request@notmuchmail.org?subject=help>
+List-Subscribe: <http://notmuchmail.org/mailman/listinfo/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=subscribe>
+MIME-Version: 1.0
+Sender: notmuch-bounces@notmuchmail.org
+Errors-To: notmuch-bounces@notmuchmail.org
+X-Keywords: dev/notmuch
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+This exposes the committed database revision to library users along
+with a UUID that can be used to detect when revision numbers are no
+longer comparable (e.g., because the database has been replaced).
+---
+ lib/database-private.h |  1 +
+ lib/database.cc        | 11 +++++++++++
+ lib/notmuch.h          | 18 ++++++++++++++++++
+ 3 files changed, 30 insertions(+)
+
+diff --git a/lib/database-private.h b/lib/database-private.h
+index 465065d..0977229 100644
+--- a/lib/database-private.h
++++ b/lib/database-private.h
+@@ -157,6 +157,7 @@ struct _notmuch_database {
+      * under a higher revision number, which can be generated with
+      * notmuch_database_new_revision. */
+     unsigned long revision;
++    const char *uuid;
+ 
+     Xapian::QueryParser *query_parser;
+     Xapian::TermGenerator *term_gen;
+diff --git a/lib/database.cc b/lib/database.cc
+index 45d32ab..9bec170 100644
+--- a/lib/database.cc
++++ b/lib/database.cc
+@@ -905,6 +905,8 @@ notmuch_database_open (const char *path,
+ 	    notmuch->revision = 0;
+ 	else
+ 	    notmuch->revision = Xapian::sortable_unserialise (last_mod);
++	notmuch->uuid = talloc_strdup (
++	    notmuch, notmuch->xapian_db->get_uuid ().c_str ());
+ 
+ 	notmuch->query_parser = new Xapian::QueryParser;
+ 	notmuch->term_gen = new Xapian::TermGenerator;
+@@ -1562,6 +1564,15 @@ DONE:
+     return NOTMUCH_STATUS_SUCCESS;
+ }
+ 
++unsigned long
++notmuch_database_get_revisison (notmuch_database_t *notmuch,
++				const char **uuid)
++{
++    if (*uuid)
++	*uuid = notmuch->uuid;
++    return notmuch->revision;
++}
++
+ /* We allow the user to use arbitrarily long paths for directories. But
+  * we have a term-length limit. So if we exceed that, we'll use the
+  * SHA-1 of the path for the database term.
+diff --git a/lib/notmuch.h b/lib/notmuch.h
+index 92594b9..898f7b9 100644
+--- a/lib/notmuch.h
++++ b/lib/notmuch.h
+@@ -433,6 +433,24 @@ notmuch_status_t
+ notmuch_database_end_atomic (notmuch_database_t *notmuch);
+ 
+ /**
++ * Return the committed database revision and UUID.
++ *
++ * The database revision number increases monotonically with each
++ * commit to the database.  Hence, all messages and message changes
++ * committed to the database (that is, visible to readers) have a last
++ * modification revision <= the committed database revision.  Any
++ * messages committed in the future will be assigned a modification
++ * revision > the committed database revision.
++ *
++ * The UUID is a NUL-terminated opaque string that uniquely identifies
++ * this database.  Two revision numbers are only comparable if they
++ * have the same database UUID.
++ */
++unsigned long
++notmuch_database_get_revisison (notmuch_database_t *notmuch,
++				const char **uuid);
++
++/**
+  * Retrieve a directory object from the database for 'path'.
+  *
+  * Here, 'path' should be a path relative to the path of 'database'
+-- 
+2.1.0
+
+_______________________________________________
+notmuch mailing list
+notmuch@notmuchmail.org
+http://notmuchmail.org/mailman/listinfo/notmuch

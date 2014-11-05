@@ -1,0 +1,382 @@
+Delivered-To: eg@gaute.vetsj.com
+Received: by 10.96.174.104 with SMTP id br8csp158586qdc;
+	Sun, 12 Oct 2014 23:21:27 -0700 (PDT)
+X-Received: by 10.50.73.200 with SMTP id n8mr27949908igv.16.1413181287795;       
+ Sun, 12 Oct 2014 23:21:27 -0700 (PDT)
+Return-Path: <notmuch-bounces@notmuchmail.org>
+Received: from olra.theworths.org (u15218177.onlinehome-server.com. [74.208.220.233])
+	by mx.google.com with ESMTPS id vn9si15241958igb.55.2014.10.12.23.21.27
+	for <eg@gaute.vetsj.com>        (version=TLSv1 cipher=RC4-SHA bits=128/128);        Sun, 12 Oct 2014 23:21:27 -0700 (PDT)
+Received-SPF: none (google.com: notmuch-bounces@notmuchmail.org does not
+ designate permitted sender hosts) client-ip=74.208.220.233;
+Authentication-Results: mx.google.com;       spf=neutral (google.com:
+ notmuch-bounces@notmuchmail.org does not designate permitted sender hosts)
+ smtp.mail=notmuch-bounces@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 4C011431FBF;
+	Sun, 12 Oct 2014 23:21:27 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id eouMm3dq8wxN; Sun, 12 Oct 2014 23:21:26 -0700 (PDT)
+Received: from olra.theworths.org (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 4231B431E64;
+	Sun, 12 Oct 2014 23:20:45 -0700 (PDT)
+X-Original-To: notmuch@notmuchmail.org
+Delivered-To: notmuch@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 9402D431FDA
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:39 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id vJiu2E2zbxAs for <notmuch@notmuchmail.org>;
+	Sun, 12 Oct 2014 23:20:33 -0700 (PDT)
+Received: from dmz-mailsec-scanner-1.mit.edu (dmz-mailsec-scanner-1.mit.edu	[18.9.25.12])	(using TLSv1
+	with cipher DHE-RSA-AES256-SHA (256/256 bits))	(No client certificate requested)
+	by olra.theworths.org (Postfix) with ESMTPS id 1ADED431FBF
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:20 -0700 (PDT)
+X-AuditID: 1209190c-f795e6d000006c66-f2-543b6f237023
+Received: from mailhub-auth-4.mit.edu ( [18.7.62.39])	(using TLS
+	with cipher AES256-SHA (256/256 bits))	(Client did not present a certificate)
+	by dmz-mailsec-scanner-1.mit.edu (Symantec Messaging Gateway) with SMTP
+	id 56.75.27750.32F6B345; Mon, 13 Oct 2014 02:20:19 -0400 (EDT)
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	by mailhub-auth-4.mit.edu (8.13.8/8.9.2) with ESMTP id s9D6K8FI019182;
+	Mon, 13 Oct 2014 02:20:08 -0400
+Received: from drake.dyndns.org ([73.162.189.21]) (authenticated bits=0)	(User authenticated as amdragon@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.13.8/8.12.4) with ESMTP
+	id s9D6K5iL031977	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=NOT);	Mon, 13 Oct 2014 02:20:07 -0400
+Received: from amthrax by drake.dyndns.org
+	with local (Exim 4.84)	(envelope-from <aclements@csail.mit.edu>)
+	id 1XdYzF-0000UC-9U; Mon, 13 Oct 2014 02:20:05 -0400
+From: Austin Clements <aclements@csail.mit.edu>
+To: notmuch@notmuchmail.org
+Subject: [WIP PATCH 2/4] lib: Add per-message last modification tracking
+Date: Mon, 13 Oct 2014 02:20:01 -0400
+Message-Id: <1413181203-1676-3-git-send-email-aclements@csail.mit.edu>
+X-Mailer: git-send-email 2.1.0
+In-Reply-To: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+References: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+X-Brightmail-Tracker: 
+ H4sIAAAAAAAAA+NgFtrIIsWRmVeSWpSXmKPExsUixG6nrqucbx1iMHOFuMX1mzOZHRg9nq26
+	xRzAGMVlk5Kak1mWWqRvl8CVcW9aRMHv0Ipf3/YxNzC+d+li5OSQEDCR6Js0mRXCFpO4cG89
+	WxcjF4eQwGwmiTvNX6CcjYwS3WeeMEM4y5kkPi2/wwzSIiSwhFFiwnpPEJtNQF9ixdpJYKNE
+	BKQldt6dDWRzcDALqEn86VIBCQsLeEi8+7wVrJVFQFVi7/8WdhCbV8BN4te5X+wQV8hJbNj9
+	nxHE5hRwl7g48SzUKjeJY23XWCYw8i9gZFjFKJuSW6Wbm5iZU5yarFucnJiXl1qka6iXm1mi
+	l5pSuokRFDKckjw7GN8cVDrEKMDBqMTDa/HHKkSINbGsuDL3EKMkB5OSKG9AmnWIEF9Sfkpl
+	RmJxRnxRaU5q8SFGCQ5mJRHetzZAOd6UxMqq1KJ8mJQ0B4uSOO+mH3whQgLpiSWp2ampBalF
+	MFkZDg4lCd53uUCNgkWp6akVaZk5JQhpJg5OkOE8QMNbckCGFxck5hZnpkPkTzEqSonzfgdp
+	FgBJZJTmwfXCYvoVozjQK8K8hiBVPMB0ANf9CmgwE9Dgo13mIINLEhFSUg2MfF9C2Wt5M1rd
+	T+6fNCV1mpKiInvAjHcdPLmbnndOcZZ0SvmTOcfS6lJZ/XWuuPvhLS1TJiox/PkZLidx7O0P
+	X+Y/9o0uz6ZlHX1b4PJ4fvsdvaA5m747izaqfXnRyC9ilJl+YsH63dIPtIINVgZfs659+MtR
+	6NBW8clMv0IaHn59aP9qR1i7EktxRqKhFnNRcSIA1lCFZcQCAAA=
+X-BeenThere: notmuch@notmuchmail.org
+X-Mailman-Version: 2.1.13
+Precedence: list
+List-Id: "Use and development of the notmuch mail system."
+	<notmuch.notmuchmail.org>
+List-Unsubscribe: <http://notmuchmail.org/mailman/options/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=unsubscribe>
+List-Archive: <http://notmuchmail.org/pipermail/notmuch>
+List-Post: <mailto:notmuch@notmuchmail.org>
+List-Help: <mailto:notmuch-request@notmuchmail.org?subject=help>
+List-Subscribe: <http://notmuchmail.org/mailman/listinfo/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=subscribe>
+MIME-Version: 1.0
+Sender: notmuch-bounces@notmuchmail.org
+Errors-To: notmuch-bounces@notmuchmail.org
+X-Keywords: dev/notmuch
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+From: Austin Clements <amdragon@mit.edu>
+
+This adds a new document value that stores the revision of the last
+modification to message metadata, where the revision number increases
+monotonically with each database commit.
+
+An alternative would be to store the wall-clock time of the last
+modification of each message.  In principle this is simpler and has
+the advantage that any process can determine the current timestamp
+without support from libnotmuch.  However, even assuming a computer's
+clock never goes backward and ignoring clock skew in networked
+environments, this has a fatal flaw.  Xapian uses (optimistic)
+snapshot isolation, which means reads can be concurrent with writes.
+Given this, consider the following time line with a write and two read
+transactions:
+
+   write  |-X-A--------------|
+   read 1       |---B---|
+   read 2                      |---|
+
+The write transaction modifies message X and records the wall-clock
+time of the modification at A.  The writer hangs around for a while
+and later commits its change.  Read 1 is concurrent with the write, so
+it doesn't see the change to X.  It does some query and records the
+wall-clock time of its results at B.  Transaction read 2 later starts
+after the write commits and queries for changes since wall-clock time
+B (say the reads are performing an incremental backup).  Even though
+read 1 could not see the change to X, read 2 is told (correctly) that
+X has not changed since B, the time of the last read.  In fact, X
+changed before wall-clock time A, but the change was not visible until
+*after* wall-clock time B, so read 2 misses the change to X.
+
+This is tricky to solve in full-blown snapshot isolation, but because
+Xapian serializes writes, we can use a simple, monotonically
+increasing database revision number.  Furthermore, maintaining this
+revision number requires no more IO than a wall-clock time solution
+because Xapian already maintains statistics on the upper (and lower)
+bound of each value stream.
+---
+ lib/database-private.h | 15 ++++++++++++++-
+ lib/database.cc        | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
+ lib/message.cc         | 22 ++++++++++++++++++++++
+ lib/notmuch-private.h  | 10 +++++++++-
+ 4 files changed, 92 insertions(+), 4 deletions(-)
+
+diff --git a/lib/database-private.h b/lib/database-private.h
+index 15e03cc..465065d 100644
+--- a/lib/database-private.h
++++ b/lib/database-private.h
+@@ -92,6 +92,12 @@ enum _notmuch_features {
+      *
+      * Introduced: version 3. */
+     NOTMUCH_FEATURE_GHOSTS = 1 << 4,
++
++    /* If set, messages store the revision number of the last
++     * modification in NOTMUCH_VALUE_LAST_MOD.
++     *
++     * Introduced: version 3. */
++    NOTMUCH_FEATURE_LAST_MOD = 1 << 5,
+ };
+ 
+ /* In C++, a named enum is its own type, so define bitwise operators
+@@ -137,6 +143,8 @@ struct _notmuch_database {
+ 
+     notmuch_database_mode_t mode;
+     int atomic_nesting;
++    /* TRUE if changes have been made in this atomic section */
++    notmuch_bool_t atomic_dirty;
+     Xapian::Database *xapian_db;
+ 
+     /* Bit mask of features used by this database.  This is a
+@@ -145,6 +153,10 @@ struct _notmuch_database {
+ 
+     unsigned int last_doc_id;
+     uint64_t last_thread_id;
++    /* Highest committed revision number.  Modifications are recorded
++     * under a higher revision number, which can be generated with
++     * notmuch_database_new_revision. */
++    unsigned long revision;
+ 
+     Xapian::QueryParser *query_parser;
+     Xapian::TermGenerator *term_gen;
+@@ -166,7 +178,8 @@ struct _notmuch_database {
+  * databases will have it). */
+ #define NOTMUCH_FEATURES_CURRENT \
+     (NOTMUCH_FEATURE_FILE_TERMS | NOTMUCH_FEATURE_DIRECTORY_DOCS | \
+-     NOTMUCH_FEATURE_BOOL_FOLDER | NOTMUCH_FEATURE_GHOSTS)
++     NOTMUCH_FEATURE_BOOL_FOLDER | NOTMUCH_FEATURE_GHOSTS | \
++     NOTMUCH_FEATURE_LAST_MOD)
+ 
+ /* Return the list of terms from the given iterator matching a prefix.
+  * The prefix will be stripped from the strings in the returned list.
+diff --git a/lib/database.cc b/lib/database.cc
+index 6e51a72..45d32ab 100644
+--- a/lib/database.cc
++++ b/lib/database.cc
+@@ -101,6 +101,9 @@ typedef struct {
+  *
+  *	SUBJECT:	The value of the "Subject" header
+  *
++ *	LAST_MOD:	The revision number as of the last tag or
++ *			filename change.
++ *
+  * In addition, terms from the content of the message are added with
+  * "from", "to", "attachment", and "subject" prefixes for use by the
+  * user in searching. Similarly, terms from the path of the mail
+@@ -304,6 +307,8 @@ static const struct {
+       "exact folder:/path: search", "rw" },
+     { NOTMUCH_FEATURE_GHOSTS,
+       "mail documents for missing messages", "w"},
++    { NOTMUCH_FEATURE_LAST_MOD,
++      "modification tracking", "w"},
+ };
+ 
+ const char *
+@@ -678,6 +683,23 @@ _notmuch_database_ensure_writable (notmuch_database_t *notmuch)
+     return NOTMUCH_STATUS_SUCCESS;
+ }
+ 
++/* Allocate a revision number for the next change. */
++unsigned long
++_notmuch_database_new_revision (notmuch_database_t *notmuch)
++{
++    unsigned long new_revision = notmuch->revision + 1;
++
++    /* If we're in an atomic section, hold off on updating the
++     * committed revision number until we commit the atomic section.
++     */
++    if (notmuch->atomic_nesting)
++	notmuch->atomic_dirty = TRUE;
++    else
++	notmuch->revision = new_revision;
++
++    return new_revision;
++}
++
+ /* Parse a database features string from the given database version.
+  * Returns the feature bit set.
+  *
+@@ -817,6 +839,7 @@ notmuch_database_open (const char *path,
+     notmuch->atomic_nesting = 0;
+     try {
+ 	string last_thread_id;
++	string last_mod;
+ 
+ 	if (mode == NOTMUCH_DATABASE_MODE_READ_WRITE) {
+ 	    notmuch->xapian_db = new Xapian::WritableDatabase (xapian_path,
+@@ -875,6 +898,14 @@ notmuch_database_open (const char *path,
+ 		INTERNAL_ERROR ("Malformed database last_thread_id: %s", str);
+ 	}
+ 
++	/* Get current highest revision number. */
++	last_mod = notmuch->xapian_db->get_value_upper_bound (
++	    NOTMUCH_VALUE_LAST_MOD);
++	if (last_mod.empty ())
++	    notmuch->revision = 0;
++	else
++	    notmuch->revision = Xapian::sortable_unserialise (last_mod);
++
+ 	notmuch->query_parser = new Xapian::QueryParser;
+ 	notmuch->term_gen = new Xapian::TermGenerator;
+ 	notmuch->term_gen->set_stemmer (Xapian::Stem ("english"));
+@@ -1266,7 +1297,8 @@ notmuch_database_upgrade (notmuch_database_t *notmuch,
+ 
+     /* Figure out how much total work we need to do. */
+     if (new_features &
+-	(NOTMUCH_FEATURE_FILE_TERMS | NOTMUCH_FEATURE_BOOL_FOLDER)) {
++	(NOTMUCH_FEATURE_FILE_TERMS | NOTMUCH_FEATURE_BOOL_FOLDER |
++	 NOTMUCH_FEATURE_LAST_MOD)) {
+ 	notmuch_query_t *query = notmuch_query_create (notmuch, "");
+ 	total += notmuch_query_count_messages (query);
+ 	notmuch_query_destroy (query);
+@@ -1293,7 +1325,8 @@ notmuch_database_upgrade (notmuch_database_t *notmuch,
+ 
+     /* Perform per-message upgrades. */
+     if (new_features &
+-	(NOTMUCH_FEATURE_FILE_TERMS | NOTMUCH_FEATURE_BOOL_FOLDER)) {
++	(NOTMUCH_FEATURE_FILE_TERMS | NOTMUCH_FEATURE_BOOL_FOLDER |
++	 NOTMUCH_FEATURE_LAST_MOD)) {
+ 	notmuch_query_t *query = notmuch_query_create (notmuch, "");
+ 	notmuch_messages_t *messages;
+ 	notmuch_message_t *message;
+@@ -1330,6 +1363,13 @@ notmuch_database_upgrade (notmuch_database_t *notmuch,
+ 	    if (new_features & NOTMUCH_FEATURE_BOOL_FOLDER)
+ 		_notmuch_message_upgrade_folder (message);
+ 
++	    /* Prior to NOTMUCH_FEATURE_LAST_MOD, messages did not
++	     * track modification revisions.  Give all messages a
++	     * revision of 1.
++	     */
++	    if (new_features & NOTMUCH_FEATURE_LAST_MOD)
++		_notmuch_message_upgrade_last_mod (message);
++
+ 	    _notmuch_message_sync (message);
+ 
+ 	    notmuch_message_destroy (message);
+@@ -1512,6 +1552,11 @@ notmuch_database_end_atomic (notmuch_database_t *notmuch)
+ 	return NOTMUCH_STATUS_XAPIAN_EXCEPTION;
+     }
+ 
++    if (notmuch->atomic_dirty) {
++	++notmuch->revision;
++	notmuch->atomic_dirty = FALSE;
++    }
++
+ DONE:
+     notmuch->atomic_nesting--;
+     return NOTMUCH_STATUS_SUCCESS;
+diff --git a/lib/message.cc b/lib/message.cc
+index cf2fd7c..767f0ab 100644
+--- a/lib/message.cc
++++ b/lib/message.cc
+@@ -996,6 +996,16 @@ _notmuch_message_set_header_values (notmuch_message_t *message,
+     message->modified = TRUE;
+ }
+ 
++/* Upgrade a message to support NOTMUCH_FEATURE_LAST_MOD.  The caller
++ * must call _notmuch_message_sync. */
++void
++_notmuch_message_upgrade_last_mod (notmuch_message_t *message)
++{
++    /* _notmuch_message_sync will update the last modification
++     * revision; we just have to ask it to. */
++    message->modified = TRUE;
++}
++
+ /* Synchronize changes made to message->doc out into the database. */
+ void
+ _notmuch_message_sync (notmuch_message_t *message)
+@@ -1008,6 +1018,18 @@ _notmuch_message_sync (notmuch_message_t *message)
+     if (! message->modified)
+ 	return;
+ 
++    /* Update the last modification of this message. */
++    if (message->notmuch->features & NOTMUCH_FEATURE_LAST_MOD)
++	/* sortable_serialise gives a reasonably compact encoding,
++	 * which directly translates to reduced IO when scanning the
++	 * value stream.  Since it's built for doubles, we only get 53
++	 * effective bits, but that's still enough for the database to
++	 * last a few centuries at 1 million revisions per second. */
++	message->doc.add_value (NOTMUCH_VALUE_LAST_MOD,
++				Xapian::sortable_serialise (
++				    _notmuch_database_new_revision (
++					message->notmuch)));
++
+     db = static_cast <Xapian::WritableDatabase *> (message->notmuch->xapian_db);
+     db->replace_document (message->doc_id, message->doc);
+     message->modified = FALSE;
+diff --git a/lib/notmuch-private.h b/lib/notmuch-private.h
+index 2f43c1d..cb85738 100644
+--- a/lib/notmuch-private.h
++++ b/lib/notmuch-private.h
+@@ -108,7 +108,8 @@ typedef enum {
+     NOTMUCH_VALUE_TIMESTAMP = 0,
+     NOTMUCH_VALUE_MESSAGE_ID,
+     NOTMUCH_VALUE_FROM,
+-    NOTMUCH_VALUE_SUBJECT
++    NOTMUCH_VALUE_SUBJECT,
++    NOTMUCH_VALUE_LAST_MOD,
+ } notmuch_value_t;
+ 
+ /* Xapian (with flint backend) complains if we provide a term longer
+@@ -191,6 +192,9 @@ _notmuch_message_id_compressed (void *ctx, const char *message_id);
+ notmuch_status_t
+ _notmuch_database_ensure_writable (notmuch_database_t *notmuch);
+ 
++unsigned long
++_notmuch_database_new_revision (notmuch_database_t *notmuch);
++
+ const char *
+ _notmuch_database_relative_path (notmuch_database_t *notmuch,
+ 				 const char *path);
+@@ -302,6 +306,10 @@ _notmuch_message_set_header_values (notmuch_message_t *message,
+ 				    const char *date,
+ 				    const char *from,
+ 				    const char *subject);
++
++void
++_notmuch_message_upgrade_last_mod (notmuch_message_t *message);
++
+ void
+ _notmuch_message_sync (notmuch_message_t *message);
+ 
+-- 
+2.1.0
+
+_______________________________________________
+notmuch mailing list
+notmuch@notmuchmail.org
+http://notmuchmail.org/mailman/listinfo/notmuch

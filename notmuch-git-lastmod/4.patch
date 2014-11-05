@@ -1,0 +1,176 @@
+Delivered-To: eg@gaute.vetsj.com
+Received: by 10.96.174.104 with SMTP id br8csp158522qdc;
+	Sun, 12 Oct 2014 23:20:43 -0700 (PDT)
+X-Received: by 10.43.138.134 with SMTP id is6mr67204icc.96.1413181243735;       
+ Sun, 12 Oct 2014 23:20:43 -0700 (PDT)
+Return-Path: <notmuch-bounces@notmuchmail.org>
+Received: from olra.theworths.org (u15218177.onlinehome-server.com. [74.208.220.233])
+	by mx.google.com with ESMTPS id q17si8274543ioe.100.2014.10.12.23.20.43
+	for <eg@gaute.vetsj.com>        (version=TLSv1 cipher=RC4-SHA bits=128/128);        Sun, 12 Oct 2014 23:20:43 -0700 (PDT)
+Received-SPF: none (google.com: notmuch-bounces@notmuchmail.org does not
+ designate permitted sender hosts) client-ip=74.208.220.233;
+Authentication-Results: mx.google.com;       spf=neutral (google.com:
+ notmuch-bounces@notmuchmail.org does not designate permitted sender hosts)
+ smtp.mail=notmuch-bounces@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 31609431FC0;
+	Sun, 12 Oct 2014 23:20:43 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id UR2FIdFmlMtb; Sun, 12 Oct 2014 23:20:42 -0700 (PDT)
+Received: from olra.theworths.org (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 34B91431FC9;
+	Sun, 12 Oct 2014 23:20:24 -0700 (PDT)
+X-Original-To: notmuch@notmuchmail.org
+Delivered-To: notmuch@notmuchmail.org
+Received: from localhost (localhost [127.0.0.1])
+	by olra.theworths.org (Postfix) with ESMTP id 6E559431FBF
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:18 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at olra.theworths.org
+Received: from olra.theworths.org ([127.0.0.1])
+	by localhost (olra.theworths.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id Cz8pLV56TWLf for <notmuch@notmuchmail.org>;
+	Sun, 12 Oct 2014 23:20:11 -0700 (PDT)
+Received: from dmz-mailsec-scanner-5.mit.edu (dmz-mailsec-scanner-5.mit.edu	[18.7.68.34])
+	by olra.theworths.org (Postfix) with ESMTP id E0116431FAF
+	for <notmuch@notmuchmail.org>; Sun, 12 Oct 2014 23:20:10 -0700 (PDT)
+X-AuditID: 12074422-f79436d000000c21-6d-543b6f1a72a1
+Received: from mailhub-auth-2.mit.edu ( [18.7.62.36])	(using TLS
+	with cipher AES256-SHA (256/256 bits))	(Client did not present a certificate)
+	by dmz-mailsec-scanner-5.mit.edu (Symantec Messaging Gateway) with SMTP
+	id 08.FC.03105.A1F6B345; Mon, 13 Oct 2014 02:20:10 -0400 (EDT)
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	by mailhub-auth-2.mit.edu (8.13.8/8.9.2) with ESMTP id s9D6K8Pb001787;
+	Mon, 13 Oct 2014 02:20:08 -0400
+Received: from drake.dyndns.org ([73.162.189.21]) (authenticated bits=0)	(User authenticated as amdragon@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.13.8/8.12.4) with ESMTP
+	id s9D6K524031970	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=NOT);	Mon, 13 Oct 2014 02:20:07 -0400
+Received: from amthrax by drake.dyndns.org
+	with local (Exim 4.84)	(envelope-from <aclements@csail.mit.edu>)
+	id 1XdYzF-0000UK-Be; Mon, 13 Oct 2014 02:20:05 -0400
+From: Austin Clements <aclements@csail.mit.edu>
+To: notmuch@notmuchmail.org
+Subject: [WIP PATCH 4/4] lib: Add "lastmod:" queries for filtering by last
+	modification
+Date: Mon, 13 Oct 2014 02:20:03 -0400
+Message-Id: <1413181203-1676-5-git-send-email-aclements@csail.mit.edu>
+X-Mailer: git-send-email 2.1.0
+In-Reply-To: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+References: <1413181203-1676-1-git-send-email-aclements@csail.mit.edu>
+X-Brightmail-Tracker: 
+ H4sIAAAAAAAAA+NgFtrMIsWRmVeSWpSXmKPExsUixG6noiuVbx1isP+9lMX1mzOZHRg9nq26
+	xRzAGMVlk5Kak1mWWqRvl8CVsXVhF1PBXumKC5cesDcwzhbvYuTkkBAwkdhxZTEjhC0mceHe
+	erYuRi4OIYHZTBITZr5mhXA2Mko0Xm1jh3CWM0msOfMJKrOEUeLixs9sIP1sAvoSK9ZOYgWx
+	RQSkJXbenQ1kc3AwC6hJ/OlSAQkLC4RL3Jk3gQnEZhFQlTi37ilYK6+Am8S2r3/YIM6Qk9iw
+	+z/YSZwC7hIXJ55lBrGFgGqOtV1jmcDIv4CRYRWjbEpulW5uYmZOcWqybnFyYl5eapGuqV5u
+	ZoleakrpJkZw2Lgo7WD8eVDpEKMAB6MSD6/FH6sQIdbEsuLK3EOMkhxMSqK8AWnWIUJ8Sfkp
+	lRmJxRnxRaU5qcWHGCU4mJVEeN/aAOV4UxIrq1KL8mFS0hwsSuK8m37whQgJpCeWpGanphak
+	FsFkZTg4lCR4V+QBNQoWpaanVqRl5pQgpJk4OEGG8wANXwRSw1tckJhbnJkOkT/FqCglzvs9
+	FyghAJLIKM2D64XF9StGcaBXhHnjQNp5gCkBrvsV0GAmoMFHu8xBBpckIqSkGhinL05mPHq3
+	9eiuj1uMVjG/1f3dajRhz/NDD1YplkYvPyGYraJXHrmLvXfrj5rl8+dxtm/Suayxge2Af39P
+	S3WpYqzsl6OZ/csC1iUJMJ5x2lYU+oHvi0hezmy1HUecvAU1XySu3nV50ocVlc9Xbdf4vH7p
+	o9/7H5Xt+LxkfUFcgqIt0ye+gEdtSizFGYmGWsxFxYkAgkepZ8YCAAA=
+X-BeenThere: notmuch@notmuchmail.org
+X-Mailman-Version: 2.1.13
+Precedence: list
+List-Id: "Use and development of the notmuch mail system."
+	<notmuch.notmuchmail.org>
+List-Unsubscribe: <http://notmuchmail.org/mailman/options/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=unsubscribe>
+List-Archive: <http://notmuchmail.org/pipermail/notmuch>
+List-Post: <mailto:notmuch@notmuchmail.org>
+List-Help: <mailto:notmuch-request@notmuchmail.org?subject=help>
+List-Subscribe: <http://notmuchmail.org/mailman/listinfo/notmuch>,
+	<mailto:notmuch-request@notmuchmail.org?subject=subscribe>
+MIME-Version: 1.0
+Sender: notmuch-bounces@notmuchmail.org
+Errors-To: notmuch-bounces@notmuchmail.org
+X-Keywords: dev/notmuch
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+From: Austin Clements <amdragon@mit.edu>
+
+XXX Includes reference to notmuch search --db-revision, which doesn't
+exist.
+---
+ doc/man7/notmuch-search-terms.rst | 8 ++++++++
+ lib/database-private.h            | 1 +
+ lib/database.cc                   | 4 ++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/doc/man7/notmuch-search-terms.rst b/doc/man7/notmuch-search-terms.rst
+index 1acdaa0..df76e39 100644
+--- a/doc/man7/notmuch-search-terms.rst
++++ b/doc/man7/notmuch-search-terms.rst
+@@ -52,6 +52,8 @@ indicate user-supplied values):
+ 
+ -  date:<since>..<until>
+ 
++-  lastmod:<since>..<until>
++
+ The **from:** prefix is used to match the name or address of the sender
+ of an email message.
+ 
+@@ -118,6 +120,12 @@ The time range can also be specified using timestamps with a syntax of:
+ Each timestamp is a number representing the number of seconds since
+ 1970-01-01 00:00:00 UTC.
+ 
++The **lastmod:** prefix can be used to restrict the result by the
++database revision number of when messages were last modified (tags
++were added/removed or filenames changed).  This is usually used in
++conjunction with the **--db-revision** argument to **notmuch search**
++to find messages that have changed since an earlier query.
++
+ In addition to individual terms, multiple terms can be combined with
+ Boolean operators ( **and**, **or**, **not** , etc.). Each term in the
+ query will be implicitly connected by a logical AND if no explicit
+diff --git a/lib/database-private.h b/lib/database-private.h
+index 0977229..cbca1de 100644
+--- a/lib/database-private.h
++++ b/lib/database-private.h
+@@ -163,6 +163,7 @@ struct _notmuch_database {
+     Xapian::TermGenerator *term_gen;
+     Xapian::ValueRangeProcessor *value_range_processor;
+     Xapian::ValueRangeProcessor *date_range_processor;
++    Xapian::ValueRangeProcessor *last_mod_range_processor;
+ };
+ 
+ /* Prior to database version 3, features were implied by the database
+diff --git a/lib/database.cc b/lib/database.cc
+index 9bec170..f9aa45d 100644
+--- a/lib/database.cc
++++ b/lib/database.cc
+@@ -913,6 +913,7 @@ notmuch_database_open (const char *path,
+ 	notmuch->term_gen->set_stemmer (Xapian::Stem ("english"));
+ 	notmuch->value_range_processor = new Xapian::NumberValueRangeProcessor (NOTMUCH_VALUE_TIMESTAMP);
+ 	notmuch->date_range_processor = new ParseTimeValueRangeProcessor (NOTMUCH_VALUE_TIMESTAMP);
++	notmuch->last_mod_range_processor = new Xapian::NumberValueRangeProcessor (NOTMUCH_VALUE_LAST_MOD, "lastmod:");
+ 
+ 	notmuch->query_parser->set_default_op (Xapian::Query::OP_AND);
+ 	notmuch->query_parser->set_database (*notmuch->xapian_db);
+@@ -920,6 +921,7 @@ notmuch_database_open (const char *path,
+ 	notmuch->query_parser->set_stemming_strategy (Xapian::QueryParser::STEM_SOME);
+ 	notmuch->query_parser->add_valuerangeprocessor (notmuch->value_range_processor);
+ 	notmuch->query_parser->add_valuerangeprocessor (notmuch->date_range_processor);
++	notmuch->query_parser->add_valuerangeprocessor (notmuch->last_mod_range_processor);
+ 
+ 	for (i = 0; i < ARRAY_SIZE (BOOLEAN_PREFIX_EXTERNAL); i++) {
+ 	    prefix_t *prefix = &BOOLEAN_PREFIX_EXTERNAL[i];
+@@ -991,6 +993,8 @@ notmuch_database_close (notmuch_database_t *notmuch)
+     notmuch->value_range_processor = NULL;
+     delete notmuch->date_range_processor;
+     notmuch->date_range_processor = NULL;
++    delete notmuch->last_mod_range_processor;
++    notmuch->last_mod_range_processor = NULL;
+ 
+     return status;
+ }
+-- 
+2.1.0
+
+_______________________________________________
+notmuch mailing list
+notmuch@notmuchmail.org
+http://notmuchmail.org/mailman/listinfo/notmuch

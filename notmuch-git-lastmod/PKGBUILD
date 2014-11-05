@@ -1,0 +1,104 @@
+# Contributor: Mark Foxwell <fastfret79@archlinux.org.uk>
+# Contributor: Olivier Ramonat <olivier at ramonat dot fr>
+# Contributor: Richard Murri <admin@richardmurri.com>
+# Contributor: Bryan Ames <b130610@gmail.com>
+
+# notmuch-git with lastmod patches:
+# id:1413181203-1676-5-git-send-email-aclements@csail.mit.edu
+#
+
+_pkgname=notmuch
+pkgname=notmuch-git-lastmod
+pkgver=0.18.2.r162.34d2c62
+pkgrel=1
+pkgdesc="Notmuch is not much of an email program"
+arch=('i686' 'x86_64')
+url="http://notmuchmail.org/"
+license=('GPL3')
+depends=('xapian-core' 'gmime' 'talloc')
+makedepends=('git' 'python2' 'ruby' 'doxygen' 'python-sphinx')
+provides=('notmuch' 'notmuch-vim' 'notmuch-runtime' )
+conflicts=('notmuch' 'notmuch-vim''notmuch-runtime' )
+optdepends=('emacs: for using the emacs interface'
+            'vim: for using the vim interface'
+            'python: for using the python bindings'
+            'python2: for using the python2 bindings'
+            'gnupg: for email encryption')
+source=("git://notmuchmail.org/git/notmuch"
+        "1.patch"
+        "2.patch"
+        "3.patch"
+        "4.patch")
+md5sums=('SKIP'
+         'e08693af4cf08daf589402244583439a'
+         '3e618b2d0c734bb75ac1efa4900f5e79'
+         '0cf5f021df61461decd81158cb5f5529'
+         '0b5d74711091fb641516a2b67972206b')
+
+
+pkgver() {
+  cd $_pkgname
+  git describe --long | sed -r 's|^[a-z]*/*([^-]+)-*[0-9]*-([0-9]+)-g([0-9]+)|\1.r\2.\3|'
+}
+
+prepare() {
+  # Will build python 2 and python 3 bindings
+  cp -r $_pkgname/bindings/python $_pkgname/bindings/python2
+  cd $_pkgname/bindings/python2
+  find "." -name '*.py' -print0 |xargs -0 \
+      sed -i -e 's,^#!/usr/bin/env python$,#!/usr/bin/env python2,' \
+      -e 's,^#!/usr/bin/python$,#!/usr/bin/python2,'
+  sed -i -e 's/\(^.*\)python\(.*\.py$\)/\1python2\2/' ../../doc/Makefile.local
+  ln -s ../../lib/libnotmuch.so.1 libnotmuch.so.1
+
+  cd "$srcdir/$_pkgname"
+  patch -p1 -i $srcdir/1.patch
+  patch -p1 -i $srcdir/2.patch
+  patch -p1 -i $srcdir/3.patch
+  patch -p1 -i $srcdir/4.patch
+}
+
+build() {
+  cd "$srcdir/$_pkgname"
+
+  # Workaround to fix uptream error
+  # mv emacs/notmuch-version.el.tmpl emacs/notmuch-version.el
+
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --zshcompletiondir=/usr/share/zsh/site-functions
+  make
+
+  cd bindings/python
+  env LD_LIBRARY_PATH="." python setup.py build
+
+  cd ../python2
+  env LD_LIBRARY_PATH="." python2 setup.py build
+
+  cd ../ruby
+  ruby extconf.rb --vendor
+
+}
+
+
+package(){
+  cd "$srcdir/$_pkgname"
+  make DESTDIR="$pkgdir/" LIBDIR_IN_LDCONFIG=0 install
+
+  install -D notmuch $pkgdir/usr/bin/notmuch
+
+  mkdir -p $pkgdir/usr/share/vim/vimfiles/{plugin,syntax}
+
+  cd vim && make prefix="$pkgdir/usr/share/vim/vimfiles" install
+
+  # Install ruby bindings
+  cd $srcdir/$_pkgname/bindings/ruby
+  sed -i -e 's,/site_ruby,,g' Makefile
+  make exec_prefix=$pkgdir/usr prefix=/usr install
+
+  # Install python bindings
+  cd $srcdir/$_pkgname/bindings/python
+  env LD_LIBRARY_PATH="." python setup.py install --prefix=/usr --root=$pkgdir
+  cd $srcdir/$_pkgname/bindings/python2
+  env LD_LIBRARY_PATH="." python2 setup.py install --prefix=/usr --root=$pkgdir
+}
