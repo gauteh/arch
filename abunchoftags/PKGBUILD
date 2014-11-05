@@ -1,6 +1,6 @@
 # Maintainer: Gaute Hope <eg@gaute.vetsj.com>
 pkgname=abunchoftags
-pkgver=8578bdb
+pkgver=0651600
 pkgrel=1
 epoch=
 pkgdesc="a keyword <-> tag sync utility for notmuch and offlineimap/GMail"
@@ -8,7 +8,7 @@ arch=('x86_64' 'i686')
 url="https://github.com/gauteh/abunchoftags"
 license=('GPL')
 groups=()
-depends=('notmuch' 'boost' 'boost-libs')
+depends=('notmuch' 'boost' 'boost-libs' 'gmime')
 makedepends=('scons' 'git' 'pkg-config')
 checkdepends=('')
 optdepends=()
