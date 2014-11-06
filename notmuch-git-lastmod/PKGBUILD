@@ -9,7 +9,7 @@
 
 _pkgname=notmuch
 pkgname=notmuch-git-lastmod
-pkgver=0.18.2.r162.34d2c62
+pkgver=0.19_rc1.r0.4bd95a3
 pkgrel=1
 pkgdesc="Notmuch is not much of an email program"
 arch=('i686' 'x86_64')
@@ -54,7 +54,10 @@ prepare() {
   cd "$srcdir/$_pkgname"
   patch -p1 -i $srcdir/1.patch
   patch -p1 -i $srcdir/2.patch
-  patch -p1 -i $srcdir/3.patch
+
+  # theres a typo in 3.patch
+  sed -e 's|revisison|revision|g' $srcdir/3.patch | patch -p1
+  #patch -p1 -i $srcdir/3.patch
   patch -p1 -i $srcdir/4.patch
 }
 
