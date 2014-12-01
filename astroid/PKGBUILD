@@ -1,6 +1,6 @@
 # Maintainer: Gaute Hope <eg@gaute.vetsj.com>
 pkgname=astroid
-pkgver=164fe7d
+pkgver=v0.1.r3.g45dc19e
 pkgrel=1
 epoch=
 pkgdesc="a threads-with-tags style, lightweight and fast, email client for notmuch, inspired by sup and others"
