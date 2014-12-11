@@ -1,0 +1,45 @@
+# Maintainer: Gaute Hope <eg@gaute.vetsj.com>
+pkgname=plotmtv
+pkgver=1.4.4t
+pkgrel=1
+epoch=
+pkgdesc="PLOTMTV is a multipurpose X11 plotting program.
+PLOTMTV specializes in contour plots, but it can also handle 2D and 3D
+plots."
+arch=('x86_64')
+url="ftp://ftp.x.org/contrib/applications/Plotmtv1.4.1.README"
+license=('AS-IS')
+groups=()
+depends=()
+makedepends=('imake')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+#source=('ftp://ftp.x.org/contrib/applications/Plotmtv1.4.1.tar.Z')
+source=('https://launchpad.net/ubuntu/+archive/primary/+files/plotmtv_1.4.4t.orig.tar.gz' 'https://launchpad.net/ubuntu/+archive/primary/+files/plotmtv_1.4.4t-10ubuntu1.diff.gz')
+noextract=()
+
+build() {
+  cd "$srcdir/Plotmtv1.4.4t"
+
+  patch -p1 < ../plotmtv_1.4.4t-10ubuntu1.diff
+
+  xmkmf -a
+  make
+}
+
+
+package() {
+  cd "$srcdir/Plotmtv1.4.4t"
+
+
+  make install DESTDIR=$pkgdir
+}
+
+
