@@ -1,0 +1,3 @@
+[submodule "python-future"]
+	path = python-future
+	url = ssh://aur@aur4.archlinux.org/python-future
