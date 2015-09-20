@@ -1,3 +1,6 @@
 [submodule "python-future"]
 	path = python-future
 	url = ssh://aur@aur4.archlinux.org/python-future
+[submodule "astroid"]
+	path = astroid
+	url = ssh://aur@aur.archlinux.org/astroid.git
