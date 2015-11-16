@@ -1,0 +1,18 @@
+pkgbase = python-cartopy
+	pkgdesc = A cartographic python library with matplotlib support for visualisation
+	pkgver = 0.13.0
+	pkgrel = 1
+	url = http://scitools.org.uk/cartopy/docs/latest/
+	arch = any
+	license = LGPLv3
+	makedepends = python3
+	makedepends = cython
+	depends = python
+	depends = python-shapely
+	depends = python-pyshp
+	depends = python-pyproj
+	source = https://pypi.python.org/packages/source/C/Cartopy/Cartopy-0.13.0.tar.gz
+	md5sums = b3fc82e85132cfd1cdfacd1169b2ca4e
+
+pkgname = python-cartopy
+
