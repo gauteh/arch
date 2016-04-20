@@ -1,0 +1,183 @@
+From e813d0362fd3058090887022adeb0f72aab8558c Mon Sep 17 00:00:00 2001
+From: Gaute Hope <eg@gaute.vetsj.com>
+Date: Wed, 20 Apr 2016 10:37:27 +0200
+Subject: [PATCH] GMimeFilterHtml: add option to enclose citation in
+ blockquotes
+
+The option GMIME_FILTER_HTML_BLOCKQUOTE_CITATION encloses citations in
+blockquotes. This allows for easier customization using CSS of the
+resulting HTML.
+
+Each blockquote is not closed untill the citation depth level is closed,
+all blockquotes are closed at the end.
+
+GMIME_FILTER_HTML_MARK_CITATION is disabled when
+GMIME_FILTER_HTML_BLOCKQUOTE_CITATION is enabled.
+---
+ gmime/gmime-filter-html.c | 53 ++++++++++++++++++++++++++++++++++++++++++++---
+ gmime/gmime-filter-html.h | 15 +++++++++++---
+ 2 files changed, 62 insertions(+), 6 deletions(-)
+
+diff --git a/gmime/gmime-filter-html.c b/gmime/gmime-filter-html.c
+index edb4615..98760af 100644
+--- a/gmime/gmime-filter-html.c
++++ b/gmime/gmime-filter-html.c
+@@ -24,6 +24,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <ctype.h>
+ #include <string.h>
+ 
+ #include "url-scanner.h"
+@@ -140,6 +141,7 @@ g_mime_filter_html_init (GMimeFilterHTML *filter, GMimeFilterHTMLClass *klass)
+ 	filter->colour = 0;
+ 	filter->column = 0;
+ 	filter->pre_open = FALSE;
++  filter->prev_cit_depth = 0;
+ }
+ 
+ static void
+@@ -351,10 +353,35 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
+ 			break;
+ 		
+ 		html->column = 0;
+-		depth = 0;
++		depth = citation_depth (start, inend);
+ 		
+-		if (html->flags & GMIME_FILTER_HTML_MARK_CITATION) {
+-			if ((depth = citation_depth (start, inend)) > 0) {
++		if (html->flags & GMIME_FILTER_HTML_BLOCKQUOTE_CITATION) {
++			if (depth > html->prev_cit_depth) {
++				char bq[33];
++        int ldepth = depth > 999 ? 999 : depth;
++				g_snprintf (bq, 33, "<blockquote class=\"level_%03d\">", ldepth);
++
++				outptr = check_size (filter, outptr, &outend, 33);
++				outptr = g_stpcpy (outptr, bq);
++
++        /* remove '>' and leading space */
++        while (*start == '>') start++;
++        if (isspace (*start)) start++;
++
++        html->prev_cit_depth = depth;
++
++      } else if (depth > 0) {
++        /* we are still at the same depth or lower: remove '>' */
++        while (*start == '>') start++;
++        if (isspace (*start)) start++;
++
++			} else if (*start == '>') {
++				/* >From line */
++				start++;
++			}
++
++    } else if (html->flags & GMIME_FILTER_HTML_MARK_CITATION) {
++			if (depth > 0) {
+ 				char font[25];
+ 				
+ 				/* FIXME: we could easily support multiple colour depths here */
+@@ -419,6 +446,15 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
+ 		} else {
+ 			outptr = writeln (filter, start, inptr, outptr, &outend);
+ 		}
++
++		if ((html->flags & GMIME_FILTER_HTML_BLOCKQUOTE_CITATION) &&
++        (depth < html->prev_cit_depth)) {
++      while (html->prev_cit_depth > depth) {
++        outptr = check_size (filter, outptr, &outend, 14);
++        outptr = g_stpcpy (outptr, "</blockquote>");
++        html->prev_cit_depth--;
++      }
++    }
+ 		
+ 		if ((html->flags & GMIME_FILTER_HTML_MARK_CITATION) && depth > 0) {
+ 			outptr = check_size (filter, outptr, &outend, 8);
+@@ -442,6 +478,16 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
+ 			outptr = check_size (filter, outptr, &outend, 10);
+ 			outptr = g_stpcpy (outptr, "</pre>");
+ 		}
++
++		if ((html->flags & GMIME_FILTER_HTML_BLOCKQUOTE_CITATION) &&
++        (html->prev_cit_depth > 0)) {
++      /* close open blockquotes */
++      while (html->prev_cit_depth > 0) {
++        outptr = check_size (filter, outptr, &outend, 14);
++        outptr = g_stpcpy (outptr, "</blockquote>");
++        html->prev_cit_depth--;
++      }
++    }
+ 	} else if (start < inend) {
+ 		/* backup */
+ 		g_mime_filter_backup (filter, start, (unsigned) (inend - start));
+@@ -473,6 +519,7 @@ filter_reset (GMimeFilter *filter)
+ 	
+ 	html->column = 0;
+ 	html->pre_open = FALSE;
++  html->prev_cit_depth = 0;
+ }
+ 
+ 
+diff --git a/gmime/gmime-filter-html.h b/gmime/gmime-filter-html.h
+index 4edf5d4..d74cccc 100644
+--- a/gmime/gmime-filter-html.h
++++ b/gmime/gmime-filter-html.h
+@@ -77,13 +77,20 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  **/
+ #define GMIME_FILTER_HTML_MARK_CITATION     (1 << 4)
+ 
++/**
++ * GMIME_FILTER_HTML_MARK_CITATION_BLOCKQUOTE:
++ *
++ * Enclose citation text in blockquotes.
++ **/
++#define GMIME_FILTER_HTML_BLOCKQUOTE_CITATION     (1 << 5)
++
+ 
+ /**
+  * GMIME_FILTER_HTML_CONVERT_ADDRESSES:
+  *
+  * Wrap email addresses in "mailto:" href tags.
+  **/
+-#define GMIME_FILTER_HTML_CONVERT_ADDRESSES (1 << 5)
++#define GMIME_FILTER_HTML_CONVERT_ADDRESSES (1 << 6)
+ 
+ 
+ /**
+@@ -91,7 +98,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Converts 8bit characters to '?'.
+  **/
+-#define GMIME_FILTER_HTML_ESCAPE_8BIT       (1 << 6)
++#define GMIME_FILTER_HTML_ESCAPE_8BIT       (1 << 7)
+ 
+ 
+ /**
+@@ -99,7 +106,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Cites text by prepending "&gt; " to each cited line.
+  **/
+-#define GMIME_FILTER_HTML_CITE              (1 << 7)
++#define GMIME_FILTER_HTML_CITE              (1 << 8)
+ 
+ 
+ /**
+@@ -110,6 +117,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  * @colour: cite colour
+  * @column: current column
+  * @pre_open: currently inside of a 'pre' tag.
++ * @prev_cit_depth: current citation depth level.
+  *
+  * A filter for converting text/plain into text/html.
+  **/
+@@ -123,6 +131,7 @@ struct _GMimeFilterHTML {
+ 	
+ 	guint32 column       : 31;
+ 	guint32 pre_open     : 1;
++  guint32 prev_cit_depth : 31;
+ };
+ 
+ struct _GMimeFilterHTMLClass {
+-- 
+2.8.0
+
