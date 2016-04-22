@@ -1,0 +1,58 @@
+From 7379fae1f6b1b525730741aab50f52d69847b316 Mon Sep 17 00:00:00 2001
+From: Gaute Hope <eg@gaute.vetsj.com>
+Date: Fri, 22 Apr 2016 10:27:30 +0200
+Subject: [PATCH 2/2] incrementally add blockquotes
+
+---
+ gmime/gmime-filter-html.c | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
+
+diff --git a/gmime/gmime-filter-html.c b/gmime/gmime-filter-html.c
+index 0dda091..f99bc15 100644
+--- a/gmime/gmime-filter-html.c
++++ b/gmime/gmime-filter-html.c
+@@ -355,23 +355,33 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
+ 		depth = citation_depth (start, inend);
+ 		
+ 		if (html->flags & GMIME_FILTER_HTML_BLOCKQUOTE_CITATION) {
+-			if (depth > html->prev_cit_depth) {
+-				char bq[33];
+-        int ldepth = depth > 999 ? 999 : depth;
+-				g_snprintf (bq, 33, "<blockquote class=\"level_%03d\">", ldepth);
++			if (html->prev_cit_depth < depth) {
++        while (html->prev_cit_depth < depth) {
++          html->prev_cit_depth++;
+ 
+-				outptr = check_size (filter, outptr, &outend, 33);
+-				outptr = g_stpcpy (outptr, bq);
++          char bq[33];
++          int ldepth = html->prev_cit_depth > 999 ? 999 : html->prev_cit_depth;
+ 
+-        /* remove '>' and leading space */
++          g_snprintf (bq, 33, "<blockquote class=\"level_%03d\">", ldepth);
++
++          outptr = check_size (filter, outptr, &outend, 33);
++          outptr = g_stpcpy (outptr, bq);
++
++          g_printf ("cit level: %d\n", html->prev_cit_depth);
++        }
++
++        /* remove '>' */
+         while (*start == '>' && start < inend) start++;
++
++        /* remove leading space */
+         if (*start == ' ' && start < inend) start++;
+ 
+-        html->prev_cit_depth = depth;
+ 
+       } else if (depth > 0) {
+         /* we are still at the same depth or lower: remove '>' */
+         while (*start == '>' && start < inend) start++;
++
++        /* remove leading space */
+         if (*start == ' ' && start < inend) start++;
+ 
+ 			} else if (*start == '>') {
+-- 
+2.8.0
+

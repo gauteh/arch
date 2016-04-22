@@ -1,7 +1,7 @@
-From e813d0362fd3058090887022adeb0f72aab8558c Mon Sep 17 00:00:00 2001
+From a7e5cf9d83b18cd5436195923d592d1a703fc03d Mon Sep 17 00:00:00 2001
 From: Gaute Hope <eg@gaute.vetsj.com>
 Date: Wed, 20 Apr 2016 10:37:27 +0200
-Subject: [PATCH] GMimeFilterHtml: add option to enclose citation in
+Subject: [PATCH 1/2] GMimeFilterHtml: add option to enclose citation in
  blockquotes
 
 The option GMIME_FILTER_HTML_BLOCKQUOTE_CITATION encloses citations in
@@ -14,23 +14,15 @@ all blockquotes are closed at the end.
 GMIME_FILTER_HTML_MARK_CITATION is disabled when
 GMIME_FILTER_HTML_BLOCKQUOTE_CITATION is enabled.
 ---
- gmime/gmime-filter-html.c | 53 ++++++++++++++++++++++++++++++++++++++++++++---
- gmime/gmime-filter-html.h | 15 +++++++++++---
- 2 files changed, 62 insertions(+), 6 deletions(-)
+ gmime/gmime-filter-html.c | 52 ++++++++++++++++++++++++++++++++++++++++++++---
+ gmime/gmime-filter-html.h | 25 +++++++++++++++--------
+ 2 files changed, 66 insertions(+), 11 deletions(-)
 
 diff --git a/gmime/gmime-filter-html.c b/gmime/gmime-filter-html.c
-index edb4615..98760af 100644
+index edb4615..0dda091 100644
 --- a/gmime/gmime-filter-html.c
 +++ b/gmime/gmime-filter-html.c
-@@ -24,6 +24,7 @@
- #endif
- 
- #include <stdio.h>
-+#include <ctype.h>
- #include <string.h>
- 
- #include "url-scanner.h"
-@@ -140,6 +141,7 @@ g_mime_filter_html_init (GMimeFilterHTML *filter, GMimeFilterHTMLClass *klass)
+@@ -140,6 +140,7 @@ g_mime_filter_html_init (GMimeFilterHTML *filter, GMimeFilterHTMLClass *klass)
  	filter->colour = 0;
  	filter->column = 0;
  	filter->pre_open = FALSE;
@@ -38,7 +30,7 @@ index edb4615..98760af 100644
  }
  
  static void
-@@ -351,10 +353,35 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
+@@ -351,10 +352,35 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
  			break;
  		
  		html->column = 0;
@@ -57,15 +49,15 @@ index edb4615..98760af 100644
 +				outptr = g_stpcpy (outptr, bq);
 +
 +        /* remove '>' and leading space */
-+        while (*start == '>') start++;
-+        if (isspace (*start)) start++;
++        while (*start == '>' && start < inend) start++;
++        if (*start == ' ' && start < inend) start++;
 +
 +        html->prev_cit_depth = depth;
 +
 +      } else if (depth > 0) {
 +        /* we are still at the same depth or lower: remove '>' */
-+        while (*start == '>') start++;
-+        if (isspace (*start)) start++;
++        while (*start == '>' && start < inend) start++;
++        if (*start == ' ' && start < inend) start++;
 +
 +			} else if (*start == '>') {
 +				/* >From line */
@@ -77,7 +69,7 @@ index edb4615..98760af 100644
  				char font[25];
  				
  				/* FIXME: we could easily support multiple colour depths here */
-@@ -419,6 +446,15 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
+@@ -419,6 +445,15 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
  		} else {
  			outptr = writeln (filter, start, inptr, outptr, &outend);
  		}
@@ -93,7 +85,7 @@ index edb4615..98760af 100644
  		
  		if ((html->flags & GMIME_FILTER_HTML_MARK_CITATION) && depth > 0) {
  			outptr = check_size (filter, outptr, &outend, 8);
-@@ -442,6 +478,16 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
+@@ -442,6 +477,16 @@ html_convert (GMimeFilter *filter, char *in, size_t inlen, size_t prespace,
  			outptr = check_size (filter, outptr, &outend, 10);
  			outptr = g_stpcpy (outptr, "</pre>");
  		}
@@ -110,7 +102,7 @@ index edb4615..98760af 100644
  	} else if (start < inend) {
  		/* backup */
  		g_mime_filter_backup (filter, start, (unsigned) (inend - start));
-@@ -473,6 +519,7 @@ filter_reset (GMimeFilter *filter)
+@@ -473,6 +518,7 @@ filter_reset (GMimeFilter *filter)
  	
  	html->column = 0;
  	html->pre_open = FALSE;
@@ -119,46 +111,85 @@ index edb4615..98760af 100644
  
  
 diff --git a/gmime/gmime-filter-html.h b/gmime/gmime-filter-html.h
-index 4edf5d4..d74cccc 100644
+index 4edf5d4..bbc000e 100644
 --- a/gmime/gmime-filter-html.h
 +++ b/gmime/gmime-filter-html.h
-@@ -77,13 +77,20 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+@@ -42,7 +42,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Wrap stream in &lt;pre&gt; tags.
   **/
- #define GMIME_FILTER_HTML_MARK_CITATION     (1 << 4)
+-#define GMIME_FILTER_HTML_PRE               (1 << 0)
++#define GMIME_FILTER_HTML_PRE                 (1 << 0)
  
+ 
+ /**
+@@ -50,7 +50,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Convert new-lines ('\n') into &lt;br&gt; tags.
+  **/
+-#define GMIME_FILTER_HTML_CONVERT_NL        (1 << 1)
++#define GMIME_FILTER_HTML_CONVERT_NL          (1 << 1)
+ 
+ 
+ /**
+@@ -59,7 +59,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  * Preserve whitespace by converting spaces into their appropriate
+  * html entities.
+  **/
+-#define GMIME_FILTER_HTML_CONVERT_SPACES    (1 << 2)
++#define GMIME_FILTER_HTML_CONVERT_SPACES      (1 << 2)
+ 
+ 
+ /**
+@@ -67,7 +67,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Wrap detected URLs in &lt;a href=...&gt; tags.
+  **/
+-#define GMIME_FILTER_HTML_CONVERT_URLS      (1 << 3)
++#define GMIME_FILTER_HTML_CONVERT_URLS        (1 << 3)
+ 
+ 
+ /**
+@@ -75,7 +75,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Change the colour of citation text.
+  **/
+-#define GMIME_FILTER_HTML_MARK_CITATION     (1 << 4)
++#define GMIME_FILTER_HTML_MARK_CITATION       (1 << 4)
+ 
+ 
+ /**
+@@ -83,7 +83,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Wrap email addresses in "mailto:" href tags.
+  **/
+-#define GMIME_FILTER_HTML_CONVERT_ADDRESSES (1 << 5)
++#define GMIME_FILTER_HTML_CONVERT_ADDRESSES   (1 << 5)
+ 
+ 
+ /**
+@@ -91,7 +91,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Converts 8bit characters to '?'.
+  **/
+-#define GMIME_FILTER_HTML_ESCAPE_8BIT       (1 << 6)
++#define GMIME_FILTER_HTML_ESCAPE_8BIT         (1 << 6)
+ 
+ 
+ /**
+@@ -99,7 +99,14 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
+  *
+  * Cites text by prepending "&gt; " to each cited line.
+  **/
+-#define GMIME_FILTER_HTML_CITE              (1 << 7)
++#define GMIME_FILTER_HTML_CITE                (1 << 7)
++
 +/**
 + * GMIME_FILTER_HTML_MARK_CITATION_BLOCKQUOTE:
 + *
 + * Enclose citation text in blockquotes.
 + **/
-+#define GMIME_FILTER_HTML_BLOCKQUOTE_CITATION     (1 << 5)
-+
- 
- /**
-  * GMIME_FILTER_HTML_CONVERT_ADDRESSES:
-  *
-  * Wrap email addresses in "mailto:" href tags.
-  **/
--#define GMIME_FILTER_HTML_CONVERT_ADDRESSES (1 << 5)
-+#define GMIME_FILTER_HTML_CONVERT_ADDRESSES (1 << 6)
- 
- 
- /**
-@@ -91,7 +98,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
-  *
-  * Converts 8bit characters to '?'.
-  **/
--#define GMIME_FILTER_HTML_ESCAPE_8BIT       (1 << 6)
-+#define GMIME_FILTER_HTML_ESCAPE_8BIT       (1 << 7)
- 
- 
- /**
-@@ -99,7 +106,7 @@ typedef struct _GMimeFilterHTMLClass GMimeFilterHTMLClass;
-  *
-  * Cites text by prepending "&gt; " to each cited line.
-  **/
--#define GMIME_FILTER_HTML_CITE              (1 << 7)
-+#define GMIME_FILTER_HTML_CITE              (1 << 8)
++#define GMIME_FILTER_HTML_BLOCKQUOTE_CITATION (1 << 8)
  
  
  /**

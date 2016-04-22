@@ -11,7 +11,7 @@ license=('GPL')
 url="http://spruce.sourceforge.net/gmime/"
 depends=('glib2' 'gpgme' 'zlib')
 makedepends=('gtk-sharp-2' 'gobject-introspection')
-source=(http://ftp.gnome.org/pub/GNOME/sources/$pkgname/${pkgver:0:3}/$pkgname-$pkgver.tar.xz 0001-GMimeFilterHtml-add-option-to-enclose-citation-in-bl.patch)
+source=(http://ftp.gnome.org/pub/GNOME/sources/$pkgname/${pkgver:0:3}/$pkgname-$pkgver.tar.xz 0001-GMimeFilterHtml-add-option-to-enclose-citation-in-bl.patch 0002-incrementally-add-blockquotes.patch)
 sha256sums=('e0a170fb264c2ae4cecd852f4e7aaddb8d58e8f3f0b569ce2d2a4704f55bdf65')
 
 build() {
@@ -22,6 +22,7 @@ build() {
   cd "$pkgname-$pkgver"
 
   patch -p1 < ../0001-GMimeFilterHtml-add-option-to-enclose-citation-in-bl.patch
+  patch -p1 < ../0002-incrementally-add-blockquotes.patch
 
   ./configure --prefix=/usr --enable-smime \
       --disable-static
